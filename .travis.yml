@@ -1,0 +1,29 @@
+language: python
+
+python: 3.7
+dist: xenial
+sudo: true 
+
+services:
+  - postgresql
+
+env:
+  - DJANGO_VERSION=2.0.7
+
+before_script:
+  - psql -c 'CREATE DATABASE test_db;' -U postgres
+
+ 
+install:
+  - pip install -r requirements.txt
+
+run:
+  - "python manage.py makemigrations"
+  - "python manage.py migrate"
+
+
+script:
+  - coverage run --source='.' manage.py test 
+
+after_success:
+  - coveralls
