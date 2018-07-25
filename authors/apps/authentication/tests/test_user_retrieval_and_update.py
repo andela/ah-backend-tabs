@@ -1,9 +1,9 @@
 from django.test import TestCase, RequestFactory
 from authors.apps.authentication.views import UserRetrieveUpdateAPIView
-from authors.apps.authentication.models import User
+from authors.apps.authentication.models import User, UserManager
 
 
-class   UserUpdateRetrievalTestCase(TestCase):
+class UserUpdateRetrievalTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.manager = User.objects
@@ -27,9 +27,6 @@ class   UserUpdateRetrievalTestCase(TestCase):
         user = self.manager.create_user(
             username='username2', email='email2@gmail.com', password=None)
         self.assertEqual(user.email, 'email2@gmail.com')
-
-    def test_user_created_instance(self):
-        self.assertTrue(isinstance(self.user, object))
 
     def test_create_user_fail_no_email(self):
         """raise the appropriate exception when an email is missing"""

@@ -115,6 +115,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         This method is required by Django for things like handling emails.
         Typically, this would be the user's first name. Since we do not store
-        the user's real name, we return their username instead.
+        the user's real name, we re
+        turn their username instead.
         """
         return self.username
