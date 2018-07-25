@@ -8,11 +8,10 @@
 
 """Configure JWT Here"""
 
+
 class JWTAuthentication:
-    def authenticate(self,val):
+    def authenticate(self, val):
         pass
 
     def authenticate_header(self,val):
         pass
-    
-
