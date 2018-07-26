@@ -21,4 +21,3 @@ urlpatterns = [
 
     path('api/', include('authors.apps.authentication.urls', namespace='authentication')),
 ]
-

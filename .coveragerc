@@ -1,6 +1,10 @@
 [report]
 show_missing = True
 omit =
+    */python?.?/*
+    *serializers*
+    *renderers*
+    *tests*
     *__init__*
     *manage*
     *0001_initial*

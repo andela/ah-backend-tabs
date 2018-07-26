@@ -23,7 +23,7 @@ run:
 
 
 script:
-  - coverage run --source='.' manage.py test --settings=authors.settings.testing 
+  - coverage run --source='.' manage.py test --settings=authors.settings.testing
 
 after_success:
   - coveralls
