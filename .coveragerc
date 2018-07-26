@@ -8,4 +8,6 @@ omit =
     *__init__*
     *manage*
     *0001_initial*
+    */settings/*
+    *wsgi*
     
