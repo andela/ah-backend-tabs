@@ -10,8 +10,8 @@ class RegisterUserTestCase(TestCase):
         self.user = {
             "user" : {
             "email":"test@gmail.com",
-            "username":"test",
-            "password":"testpassword"
+            "username":"tester",
+            "password":"testpass@word"
         }
         }
 
@@ -43,7 +43,7 @@ class RegisterUserTestCase(TestCase):
         user = {
             "user" : {
             "email":"testgmail.com",
-            "username":"test",
+            "username":"tester",
             "password":"testpassword"
         }
         }
@@ -63,8 +63,9 @@ class RegisterUserTestCase(TestCase):
         request = self.factory.post('/api/users/', data = json.dumps(self.user), content_type='application/json')
 
         response = RegistrationAPIView.as_view()(request)
+        
+        self.assertEqual("We cannot register you because there's a user with that email already.",response.data["errors"]["email"][0])
 
-        self.assertIn('user with this email already exists.',response.data["errors"]["email"][0])
         self.assertEqual(response.status_code, 400)
 
 
@@ -76,5 +77,5 @@ class RegisterUserTestCase(TestCase):
 
         response = RegistrationAPIView.as_view()(request)
 
-        self.assertIn('user with this username already exists.',response.data["errors"]["username"][0])
+        self.assertIn("We cannot register you because there's a user with that username already.",response.data["errors"]["username"][0])
         self.assertEqual(response.status_code, 400)
