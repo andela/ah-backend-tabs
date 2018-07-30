@@ -2,6 +2,8 @@ import json
 
 from rest_framework.renderers import JSONRenderer
 
+from django.urls import reverse_lazy
+
 
 class UserJSONRenderer(JSONRenderer):
     charset = 'utf-8'
@@ -12,6 +14,7 @@ class UserJSONRenderer(JSONRenderer):
         # the default JSONRenderer to handle rendering errors, so we need to
         # check for this case.
         errors = data.get('errors', None)
+        
 
         if errors is not None:
             # As mentioned about, we will let the default JSONRenderer handle
@@ -21,5 +24,6 @@ class UserJSONRenderer(JSONRenderer):
 
         # Finally, we can render our data under the "user" namespace.
         return json.dumps({
-            'user': data
+            'user': data,
+            'message': "You were successfully registered!",
         })

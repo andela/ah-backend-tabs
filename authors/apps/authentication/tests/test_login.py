@@ -9,7 +9,7 @@ class LoginTestCase(TestCase):
             'user': {
                 'username': 'rutale',
                 'email': 'rutale@gmail.com',
-                'password': 'rutaleivan'
+                'password': 'rutaleivan#'
             }
         }
         request = self.factory.post(
@@ -27,7 +27,7 @@ class LoginTestCase(TestCase):
             'user': {
                 'username': 'rutale',
                 'email': 'rut@gmail.com',
-                'password': 'rutaleivan'
+                'password': 'rutaleivan#'
             }
         }
         request=self.factory.post(
@@ -54,7 +54,7 @@ class LoginTestCase(TestCase):
             'user': {
                 'username': 'rutale',
                 'email': '',
-                'password': 'rutaleivan'
+                'password': 'rutaleivan#'
             }
         }
         request=self.factory.post(
@@ -122,7 +122,7 @@ class LoginTestCase(TestCase):
         user = {
             'user': {
                 'username': 'rutale',
-                'password': 'rutaleivan'
+                'password': 'rutaleivan#'
             }
         }
         request=self.factory.post(
@@ -135,15 +135,11 @@ class LoginTestCase(TestCase):
         user = {
             'user': {
                 'email': 'rutale@gmail.com',
-                'password': 'rutaleivan'
+                'password': 'rutaleivan#'
             }
         }
         request=self.factory.post(
             "/api/users/login", data=json.dumps(user), content_type='application/json')
         response = LoginAPIView.as_view()(request)
+
         self.assertEqual(response.status_code,200)
-
-
-
-
-
