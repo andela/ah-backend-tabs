@@ -15,5 +15,5 @@ omit =
     *articles/models*
     */migrations/*
     */venv/*
-   
+   *email_reg_util*
     

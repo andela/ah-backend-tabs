@@ -1,6 +1,8 @@
 from django.test import TestCase, RequestFactory
 from authors.apps.authentication.views import UserRetrieveUpdateAPIView
 from authors.apps.authentication.models import User, UserManager
+from minimock import Mock
+import smtplib
 
 
 class UserUpdateRetrievalTestCase(TestCase):
@@ -9,6 +11,8 @@ class UserUpdateRetrievalTestCase(TestCase):
         self.manager = User.objects
         self.user = self.manager.create_user(
             'username', 'email@gmail.com', 'password')
+        smtplib.SMTP = Mock('smtplib.SMTP')
+        smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
     def test_no_auth_headers(self):
         """tests whether authentiction has headers """

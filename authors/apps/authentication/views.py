@@ -1,13 +1,19 @@
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from authors.settings.base import SECRET_KEY
+from .models import User
+import jwt
+import os
 
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer
 )
+from authors.apps.authentication.email_reg_util import SendAuthEmail
 
 
 class RegistrationAPIView(APIView):
@@ -25,6 +31,9 @@ class RegistrationAPIView(APIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        email_obj = SendAuthEmail()
+        email_obj.send_reg_email(request,
+                                 os.environ.get('EMAIL_HOST_USER'), serializer.data['email'], serializer.data['token'])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -72,4 +81,21 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
+
+class VerificationAPIView(UpdateAPIView):
+    permission_classes = (AllowAny,)
+    look_url_kwarg = 'token'
+
+    def update(self, request, *args, **kwargs):
+        token = self.kwargs.get(self.look_url_kwarg)
+        decoded_token = jwt.decode(token, SECRET_KEY, 'HS256')
+
+        User.objects.filter(pk=decoded_token['id']).update(is_verified=True)
+        user = User.objects.filter(pk=decoded_token['id']).values(
+            'username', 'is_verified')
+
+        user_dict = {'username': user[0]['username'],
+                     'is_verified': user[0]['is_verified']}
+
+        return Response(user_dict, status=status.HTTP_200_OK)
