@@ -1,26 +1,21 @@
-import os
-from django.core.mail import send_mail
-from django.conf import settings
-from django.template.loader import get_template
-from django.urls import reverse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from django.template.loader import get_template
 import smtplib
+import os
 
 
-class SendAuthEmail:
-    def send_reg_email(self, request=None, sender_email=None, reciever_email=None, token=None):
-
+class ResetPasswordUtil():
+    def send_mail(self, request, sender_email, reciever_email, token):
         msg = MIMEMultipart()
 
-        if request == None or sender_email == None or reciever_email == None or token == None:
+        if sender_email == None or reciever_email == None:
             raise ValueError('Invalid parameters!')
 
         msg['From'] = sender_email
         msg['To'] = reciever_email
-        msg['Subject'] = "Welcome to Author's Haven!"
+        msg['Subject'] = "Reseting password for your Author's Haven account."
         body = self.html_renderer(request, token)
-        # body = 'hi there'
         msg.attach(MIMEText(body, 'html'))
 
         server = smtplib.SMTP('smtp.gmail.com', os.environ.get('EMAIL_PORT'))
@@ -31,6 +26,6 @@ class SendAuthEmail:
         server.quit()
 
     def html_renderer(self, request, token):
-        template = get_template('authentication/email_reg_util.html')
-        context = {'token': token}
+        template = get_template('authentication/reset_link.html')
+        context = {'link': 'api/users/password/reset', 'token': token}
         return template.render(context, request)

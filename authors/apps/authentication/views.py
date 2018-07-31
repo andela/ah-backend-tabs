@@ -11,9 +11,10 @@ import os
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer,
 )
 from authors.apps.authentication.email_reg_util import SendAuthEmail
+from authors.apps.authentication.reset_password_util import ResetPasswordUtil
 
 
 class RegistrationAPIView(APIView):
@@ -99,3 +100,13 @@ class VerificationAPIView(UpdateAPIView):
                      'is_verified': user[0]['is_verified']}
 
         return Response(user_dict, status=status.HTTP_200_OK)
+
+
+class SendPasswordResetEmailAPIView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        token = jwt.encode({'email': email}, SECRET_KEY, 'HS256')
+        email_obj = ResetPasswordUtil()
+        email_obj.send_mail(request, os.environ.get(
+            'EMAIL_HOST_USER'), email, token)
+        return Response({'message': 'a link has been sent to your email.'}, status=status.HTTP_200_OK)
