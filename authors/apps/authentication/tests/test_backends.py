@@ -105,3 +105,4 @@ class BackendsTestCase(TestCase):
         with self.assertRaises(Exception) as context:
             self.auth_obj._authenticate_credentials(request, token)
         self.assertIn('User not recognised!', str(context.exception))
+

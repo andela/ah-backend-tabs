@@ -1,7 +1,7 @@
 import jwt
 
 from datetime import datetime, timedelta
-
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -60,6 +60,13 @@ class UserManager(BaseUserManager):
 
         return user
 
+    def update(self,email,bio):
+        user = User.objects.filter(email=email).update(bio=bio)
+        # user.bio = bio
+        # user.save()
+
+        return user
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     # Each `User` needs a human-readable unique identifier that we can use to
@@ -93,6 +100,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     # More fields required by Django when specifying a custom user model.
+    bio = models.CharField(max_length=255,blank = True)
+    image = models.ImageField(upload_to='profile_image',blank = True)
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.
