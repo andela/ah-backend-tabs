@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'authors.apps.articles',
+    'taggit_serializer',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +133,7 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authors.apps.authentication.backends.JWTAuthentication',
+        'authors.apps.authentication.backends.JWTAuthentication',  
     ),
     
 }
