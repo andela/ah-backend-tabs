@@ -21,6 +21,13 @@ class UserManager(BaseUserManager):
 
     def create_user(self, username, email, password=None):
         """Create and return a `User` with an email, username and password."""
+
+        if not username:
+            username = None
+
+        elif not email:
+            email = None
+
         if username is None:
             raise TypeError('Users must have a username.')
 
@@ -40,6 +47,9 @@ class UserManager(BaseUserManager):
         Superuser powers means that this use is an admin that can do anything
         they want.
         """
+        if not password:
+            password = None
+
         if password is None:
             raise TypeError('Superusers must have a password.')
 
@@ -119,3 +129,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         turn their username instead.
         """
         return self.username
+
+    @property
+    def token(self):
+        return self._generate_jwt_token()
+
+    def _generate_jwt_token(self):
+        dt = datetime.now()+timedelta(days=1)
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': int(dt.strftime('%s')),
+            'username': self.username,
+            'email': self.email
+        }, settings.SECRET_KEY, algorithm='HS256')
+        return token.decode('utf-8')
