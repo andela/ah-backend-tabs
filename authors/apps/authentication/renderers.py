@@ -14,13 +14,14 @@ class UserJSONRenderer(JSONRenderer):
         # the default JSONRenderer to handle rendering errors, so we need to
         # check for this case.
         errors = data.get('errors', None)
-        
-
         if errors is not None:
             # As mentioned about, we will let the default JSONRenderer handle
             # rendering errors.
             return super(UserJSONRenderer, self).render(data)
 
+        token = data.get('token', None)
+        if token is not None and isinstance(token, bytes):
+            data['token'] = token.decode('utf-8')
 
         # Finally, we can render our data under the "user" namespace.
         return json.dumps({
