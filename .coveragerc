@@ -14,5 +14,6 @@ omit =
     *admin*
     *articles/models*
     */migrations/*
-
+    */venv/*
+   
     
