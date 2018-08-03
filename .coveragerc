@@ -4,6 +4,8 @@ omit =
     */python?.?/*
     *serializers*
     *renderers*
+    *urls*
+    *venv*
     *tests*
     *__init__*
     *manage*
