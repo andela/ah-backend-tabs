@@ -17,8 +17,12 @@ from django.urls import include, path
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('authors.apps.authentication.urls',
-                         namespace='authentication')),
+    path('api/', include('authors.apps.articles.urls')),   
+
+    path('api/', include('authors.apps.authentication.urls', namespace='authentication')),
+    path('api/profiles', include('authors.apps.profiles.urls', namespace='profiles')),
 ]
+
