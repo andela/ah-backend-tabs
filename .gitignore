@@ -97,3 +97,6 @@ db.sqlite3
 
 #DS STORE
 .DS_Store
+
+#Images folder
+profile_image/
