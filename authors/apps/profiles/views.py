@@ -4,6 +4,8 @@ from authors.apps.authentication.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from authors.settings.base import SECRET_KEY 
+from authors.apps.authentication.backends import JWTAuthentication
 import json
 from authors.apps.profiles.serializers import (
     UpdateSerializer,ProfileSerializer
@@ -21,12 +23,13 @@ class UserUpdate(APIView):
                 
     
     def put(self,request):
+        jwt = JWTAuthentication()
         if not self.check_empty_input(request.data):
             return Response(data={
                 "error":"One of the input fields is empty."
                 },status=status.HTTP_400_BAD_REQUEST)
 
-        email = request.data.get('email')
+        email = jwt.authenticate(request)[0]
         user = User.objects.filter(email=email)
         updated_user = self.serializer_class().update(user[0], request.data)
         return Response(data=self.serializer_class(updated_user).data,status=status.HTTP_200_OK)

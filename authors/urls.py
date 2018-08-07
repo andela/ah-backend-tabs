@@ -23,6 +23,6 @@ urlpatterns = [
     path('api/', include('authors.apps.articles.urls')),   
 
     path('api/', include('authors.apps.authentication.urls', namespace='authentication')),
-    path('api/profiles', include('authors.apps.profiles.urls', namespace='profiles')),
+    path('api/profiles/', include('authors.apps.profiles.urls', namespace='profiles')),
 ]
 
