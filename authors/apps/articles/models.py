@@ -82,4 +82,17 @@ class Rating(models.Model):
 
     def __str__(self):
         return 'Rating of {} on {} by user {}'.format(self.amount, self.article, self.user)
+class Comment(models.Model):
+    author = models.ForeignKey(User, related_name = "comment_author", on_delete = models.CASCADE)
+    article = models.ForeignKey(Article,related_name = "user_comments", on_delete = models.CASCADE, blank = True)
+    body = models.TextField()
+    created_at = models.DateTimeField(editable = False,auto_now=True)
+    updated_at  = models.DateTimeField(blank = True, null = True,auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return self.body
+
 
