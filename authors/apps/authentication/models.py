@@ -60,7 +60,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def update(self,email,bio):
+    def update(self, email, bio):
         user = User.objects.filter(email=email).update(bio=bio)
         # user.bio = bio
         # user.save()
@@ -87,6 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # letting them delete it. That way they won't show up on the site anymore,
     # but we can still analyze the data.
     is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
 
     # The `is_staff` flag is expected by Django to determine who can and cannot
     # log into the Django admin site. For most users, this flag will always be
@@ -100,8 +101,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     # More fields required by Django when specifying a custom user model.
-    bio = models.CharField(max_length=255,blank = True)
-    image = models.ImageField(upload_to='profile_image',blank = True)
+    bio = models.CharField(max_length=255, blank=True)
+    image = models.ImageField(upload_to='profile_image', blank=True)
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

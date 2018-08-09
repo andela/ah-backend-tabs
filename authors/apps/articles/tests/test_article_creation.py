@@ -2,6 +2,9 @@ from django.test import TestCase, RequestFactory
 from authors.apps.articles.views import ArticleCreateAPIView
 from authors.apps.authentication.views import RegistrationAPIView
 import json
+import smtplib
+from minimock import Mock
+
 
 class CreateArticleTestCase(TestCase):
 
@@ -9,14 +12,17 @@ class CreateArticleTestCase(TestCase):
         self.factory = RequestFactory()
 
         self.user = {
-            "user" : {
-            "email":"test@gmail.com",
-            "username":"tester",
-            "password":"testpass@word"
+            "user": {
+                "email": "test@gmail.com",
+                "username": "tester",
+                "password": "testpass@word"
+            }
         }
-        }
+        smtplib.SMTP = Mock('smtplib.SMTP')
+        smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
-        self.request = self.factory.post('/api/users/', data = json.dumps(self.user), content_type='application/json')
+        self.request = self.factory.post(
+            '/api/users/', data=json.dumps(self.user), content_type='application/json')
         self.response = RegistrationAPIView.as_view()(self.request)
         self.headers = {
             'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
@@ -26,15 +32,17 @@ class CreateArticleTestCase(TestCase):
             "title": "This is Postman",
             "description": "Hello Postman",
             "body": "Hahahaha",
-            "tags": ["post","man"]
+            "tags": ["post", "man"]
         }
 
     def test_article_created_successful(self):
 
-        request = self.factory.post('api/articles', data = json.dumps(self.article_data), **self.headers, content_type = 'application/json')
+        request = self.factory.post('api/articles', data=json.dumps(
+            self.article_data), **self.headers, content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
         self.assertEqual("This is Postman", response.data["title"])
-        self.assertEqual({"username":"tester","email":"test@gmail.com"}, response.data["author"])
+        self.assertEqual(
+            {"username": "tester", "email": "test@gmail.com"}, response.data["author"])
         self.assertEqual(2, len(response.data["tags"]))
         self.assertEqual(response.status_code, 201)
 
@@ -43,54 +51,58 @@ class CreateArticleTestCase(TestCase):
             "title": "",
             "description": "Hello Postman",
             "body": "Hahahaha",
-            "tags": ["post","man"]
+            "tags": ["post", "man"]
         }
 
-        request = self.factory.post('api/articles', data = json.dumps(article_data), **self.headers, content_type = 'application/json')
+        request = self.factory.post('api/articles', data=json.dumps(
+            article_data), **self.headers, content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
-        self.assertEqual("This field may not be blank.", response.data["errors"]["title"][0])
+        self.assertEqual("This field may not be blank.",
+                         response.data["errors"]["title"][0])
         self.assertEqual(response.status_code, 400)
 
     def test_article_creation_with_missing_description(self):
         article_data = {
             "title": "This is Postman",
             "body": "Hahahaha",
-            "tags": ["post","man"]
+            "tags": ["post", "man"]
         }
 
-        request = self.factory.post('api/articles', data = json.dumps(article_data),**self.headers, content_type = 'application/json')
+        request = self.factory.post('api/articles', data=json.dumps(
+            article_data), **self.headers, content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
-        self.assertEqual("This field is required.", response.data["errors"]["description"][0])
+        self.assertEqual("This field is required.",
+                         response.data["errors"]["description"][0])
         self.assertEqual(response.status_code, 400)
 
     def test_article_creation_with_missing_body(self):
         article_data = {
             "title": "This is Postman",
             "description": "Hello Postman",
-            "tags": ["post","man"]
+            "tags": ["post", "man"]
         }
 
-        request = self.factory.post('api/articles', data = json.dumps(article_data),**self.headers, content_type = 'application/json')
+        request = self.factory.post('api/articles', data=json.dumps(
+            article_data), **self.headers, content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
-        self.assertEqual("This field is required.", response.data["errors"]["body"][0])
+        self.assertEqual("This field is required.",
+                         response.data["errors"]["body"][0])
         self.assertEqual(response.status_code, 400)
 
     def test_article_creation_without_auth_credentials(self):
-        request = self.factory.post('api/articles', data = json.dumps(self.article_data),content_type = 'application/json')
+        request = self.factory.post(
+            'api/articles', data=json.dumps(self.article_data), content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
-        self.assertEqual("Authentication credentials were not provided.", response.data["detail"])
+        self.assertEqual(
+            "Authentication credentials were not provided.", response.data["detail"])
         self.assertEqual(response.status_code, 403)
 
     def test_article_creation_with_bad_auth_credentials(self):
         headers = {
             'HTTP_AUTHORIZATION': 'Token ' + "invalid_token"
         }
-        request = self.factory.post('api/articles', data = json.dumps(self.article_data), **headers, content_type = 'application/json')
+        request = self.factory.post('api/articles', data=json.dumps(
+            self.article_data), **headers, content_type='application/json')
         response = ArticleCreateAPIView.as_view()(request)
         self.assertEqual("Authentication failed!", response.data["detail"])
         self.assertEqual(response.status_code, 403)
-
-
-
-        
-        

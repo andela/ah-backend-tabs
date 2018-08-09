@@ -7,6 +7,8 @@ import jwt
 from datetime import timedelta, datetime
 from authors.settings.base import SECRET_KEY
 from rest_framework import authentication, exceptions
+from minimock import Mock
+import smtplib
 
 
 class BackendsTestCase(TestCase):
@@ -15,11 +17,13 @@ class BackendsTestCase(TestCase):
         self.auth_obj = JWTAuthentication()
         self.user = {
             "user": {
-                "email": "test@gmail.com",
+                "email": "phillip.seryazi@andela.com",
                 "username": "tester",
                 "password": "testpass@word"
             }
         }
+        smtplib.SMTP = Mock('smtplib.SMTP')
+        smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
     def make_token(self, user):
         request = self.factory.post(
@@ -105,4 +109,3 @@ class BackendsTestCase(TestCase):
         with self.assertRaises(Exception) as context:
             self.auth_obj._authenticate_credentials(request, token)
         self.assertIn('User not recognised!', str(context.exception))
-

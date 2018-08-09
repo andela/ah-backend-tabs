@@ -1,11 +1,20 @@
 from django.test import TestCase, RequestFactory
 from authors.apps.authentication.models import User, UserManager
+from authors.apps.authentication.views import LoginAPIView, RegistrationAPIView
+from authors.settings.base import SECRET_KEY
+import json
+import jwt
+import smtplib
+from minimock import Mock
 
 
 class ModelsTestcase(TestCase):
     def setUp(self):
+        self.factory = RequestFactory()
         self.manager = User.objects
         self.user = self.manager
+        smtplib.SMTP = Mock('smtplib.SMTP')
+        smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
     def test_create_user_fail_no_username(self):
         """raise the appropriate exception when an username is missing"""

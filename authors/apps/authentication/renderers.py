@@ -28,3 +28,4 @@ class UserJSONRenderer(JSONRenderer):
             'user': data,
             'message': "You were successfully registered!",
         })
+

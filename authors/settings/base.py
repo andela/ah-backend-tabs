@@ -26,7 +26,7 @@ SECRET_KEY = '7pgozr2jn7zs_o%i8id6=rddie!*0f0qy3$oy$(8231i^4*@u3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','authors-haven-tabs.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'authors-haven-tabs.herokuapp.com']
 
 # Application definition
 
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    'djmail',
 ]
 
 MIDDLEWARE = [
@@ -139,7 +140,9 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authors.apps.authentication.backends.JWTAuthentication',  
-    ),   
+        'authors.apps.authentication.backends.JWTAuthentication',
+    ),
 }
 
+EMAIL_BACKEND="djmail.backends.default.EmailBackend"
+DJMAIL_REAL_BACKEND="django.core.mail.backends.console.EmailBackend"
