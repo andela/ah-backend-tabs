@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from authors.apps.articles.views import ArticleCreateAPIView
-from authors.apps.authentication.views import RegistrationAPIView
+from authors.apps.authentication.views import RegistrationAPIView, VerificationAPIView
 import json
 import smtplib
 from minimock import Mock
@@ -18,15 +18,18 @@ class CreateArticleTestCase(TestCase):
                 "password": "testpass@word"
             }
         }
-        smtplib.SMTP = Mock('smtplib.SMTP')
+        smtplib.SMTP = Mock('smtplib.SMTP', tracker=None)
         smtplib.SMTP.mock_returns = Mock('smtp_connection')
-
+   
         self.request = self.factory.post(
             '/api/users/', data=json.dumps(self.user), content_type='application/json')
         self.response = RegistrationAPIView.as_view()(self.request)
+
         self.headers = {
             'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
         }
+        verfication_request = self.factory.put('/api/users/verify/token',content_type='application/json')
+        VerificationAPIView.as_view()(verfication_request, **{"token":self.response.data["token"]})
 
         self.article_data = {
             "title": "This is Postman",

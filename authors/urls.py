@@ -24,5 +24,6 @@ urlpatterns = [
 
     path('api/', include('authors.apps.authentication.urls', namespace='authentication')),
     path('api/profiles/', include('authors.apps.profiles.urls', namespace='profiles')),
+    path('api/users/', include('authors.apps.follower.urls', namespace = "follows"))
 ]
 
