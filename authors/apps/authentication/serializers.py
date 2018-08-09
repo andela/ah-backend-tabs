@@ -48,23 +48,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 "Please include at least a number and any of these symbols in your password @,#,!,$,%,&,*,(,) ")
         return value
 
-    def validate_email(self, value):
-        user_qs = User.objects.filter(email=value)
-        if user_qs.exists():
-            raise serializers.ValidationError("We cannot register you because there's a user with that email already.")
-        return value
-
-    def validate_username(self, value):
-        user_qs = User.objects.filter(username=value)
-        if user_qs.exists():
-            raise serializers.ValidationError("We cannot register you because there's a user with that username already.")
-        return value
-
-    def validate_password(self, value):
-        if re.match("^[a-zA-Z0-9_]+$", value) is not None :
-            raise serializers.ValidationError("Please include at least a number and any of these symbols in your password @,#,!,$,%,&,*,(,) ")
-        return value
-
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)

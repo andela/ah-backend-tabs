@@ -3,17 +3,20 @@ from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView, Update
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from datetime import datetime, timedelta
 
 from authors.settings.base import SECRET_KEY
 from .models import User
 import jwt
 import os
+from django.contrib.auth.hashers import make_password
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer,
 )
 from authors.apps.authentication.email_reg_util import SendAuthEmail
+from authors.apps.authentication.reset_password_util import ResetPasswordUtil
 
 
 class RegistrationAPIView(APIView):
@@ -99,3 +102,36 @@ class VerificationAPIView(UpdateAPIView):
                      'is_verified': user[0]['is_verified']}
 
         return Response(user_dict, status=status.HTTP_200_OK)
+
+
+class SendPasswordResetEmailAPIView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        dt = datetime.now()+timedelta(days=1)
+        token = jwt.encode({'email': email, 'exp': int(
+            dt.strftime('%s'))}, SECRET_KEY, 'HS256')
+        email_obj = ResetPasswordUtil()
+        email_obj.send_mail(request, os.environ.get(
+            'EMAIL_HOST_USER'), email, token)
+        return Response({'message': 'a link has been sent to your email.', 'token': token}, status=status.HTTP_200_OK)
+
+
+class ResetPasswordAPIView(UpdateAPIView):
+    permission_classes = (AllowAny,)
+    look_url_kwarg = 'token'
+
+    def update(self, request, *args, **kwargs):
+        token = self.kwargs.get(self.look_url_kwarg)
+
+        password = request.data.get('password')
+        retyped_password = request.data.get('retyped_password')
+
+        if password != retyped_password:
+            raise Exception('Passwords do not match!')
+
+        decoded_token = jwt.decode(token, SECRET_KEY, 'HS256')
+        user = User.objects.get(email=decoded_token['email'])
+        user.set_password(retyped_password)
+        user.save()
+
+        return Response({'message': 'your password has been changed.'}, status=status.HTTP_201_CREATED)
