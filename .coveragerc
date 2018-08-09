@@ -16,4 +16,5 @@ omit =
     */migrations/*
     */venv/*
    *email_reg_util*
+   *reset_password_util*
     

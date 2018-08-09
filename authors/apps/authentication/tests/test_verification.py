@@ -12,7 +12,7 @@ class TestVerification(TestCase):
         self.factory = RequestFactory()
         self.user = {
             "user": {
-                "email": "phillip.seryazi@andela.com",
+                "email": "test@gmail.com",
                 "username": "tester",
                 "password": "testpass@word"
             }
