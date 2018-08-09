@@ -17,9 +17,11 @@ class Article(models.Model):
     author = models.ForeignKey(User, related_name = "user_articles", on_delete = models.CASCADE)
     favorited = models.BooleanField(default = False)
     favoritesCount = models.IntegerField(default = 0)
+    dislikesCount = models.IntegerField(default = 0)
     tags = TaggableManager(blank = True)
     rating = models.PositiveIntegerField(blank = True, editable = False, null = True)
-
+    likes = models.ManyToManyField(User,related_name="likes",blank=True)
+    dislikes = models.ManyToManyField(User,related_name="dislikes",blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
