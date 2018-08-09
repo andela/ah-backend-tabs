@@ -1,17 +1,19 @@
 from django.test import TestCase,RequestFactory
 from authors.apps.profiles.views import ProfileView,UserUpdate
 from authors.apps.authentication.models import User
-from authors.apps.authentication.views import RegistrationAPIView
+from authors.apps.authentication.views import LoginAPIView
 import json
 
 class ProfileViewTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        # self.user = User.objects.create_user(
-        #     username='rutale',
-        #     email='rutale@gmail.com',
-        #     password='pass'
-        # )
+        self.user = User.objects.create_user(
+            username='rutale',
+            email='rutale@gmail.com',
+            password='rutale1234*'
+        )
+        self.user.is_verified = True
+        self.user.save()
         self.user_to_register = {
             "user":{
                  "email": "rutale@gmail.com",
@@ -25,8 +27,8 @@ class ProfileViewTestCase(TestCase):
 
     def make_token(self, user):
         request = self.factory.post(
-            '/api/users/', data=json.dumps(user), content_type='application/json')
-        response = RegistrationAPIView.as_view()(request)
+            '/api/users/login/', data=json.dumps(user), content_type='application/json')
+        response = LoginAPIView.as_view()(request)
         return response.data['token']
         
     def test_get_profile_normal(self):

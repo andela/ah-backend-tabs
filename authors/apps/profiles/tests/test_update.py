@@ -1,7 +1,7 @@
 from django.test import TestCase,RequestFactory
 from authors.apps.profiles.views import ProfileView,UserUpdate
 from authors.apps.authentication.models import User
-from authors.apps.authentication.views import RegistrationAPIView,LoginAPIView
+from authors.apps.authentication.views import LoginAPIView
 from PIL import Image
 import json
 import tempfile
@@ -9,6 +9,13 @@ import tempfile
 class UpdateTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username='rutale',
+            email='rutale@gmail.com',
+            password='rutale1234*'
+        )
+        self.user.is_verified = True
+        self.user.save()
         self.user_to_register = {
             "user":{
                  "email": "rutale@gmail.com",
@@ -16,16 +23,14 @@ class UpdateTestCase(TestCase):
                   "username":"rutale"
             }
         }
-
         self.headers = {
             'HTTP_AUTHORIZATION': 'Token ' + self.make_token(self.user_to_register)
         }
 
-    
     def make_token(self, user):
         request = self.factory.post(
-            '/api/users/', data=json.dumps(user), content_type='application/json')
-        response = RegistrationAPIView.as_view()(request)
+            '/api/users/login/', data=json.dumps(user), content_type='application/json')
+        response = LoginAPIView.as_view()(request)
         return response.data['token']
 
     def test_update_bio_normal(self):

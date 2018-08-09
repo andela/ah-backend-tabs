@@ -22,6 +22,7 @@ class Article(models.Model):
     rating = models.PositiveIntegerField(blank = True, editable = False, null = True)
     likes = models.ManyToManyField(User,related_name="likes",blank=True)
     dislikes = models.ManyToManyField(User,related_name="dislikes",blank=True)
+    favorites = models.ManyToManyField(User,related_name="favorites",blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
