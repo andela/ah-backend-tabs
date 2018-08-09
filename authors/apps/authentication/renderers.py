@@ -2,8 +2,6 @@ import json
 
 from rest_framework.renderers import JSONRenderer
 
-from django.urls import reverse_lazy
-
 
 class UserJSONRenderer(JSONRenderer):
     charset = 'utf-8'
