@@ -1,7 +1,8 @@
 from django.test import TestCase, RequestFactory
 from authors.apps.articles.views import CommentCreateAPIView,ArticleCreateAPIView
-from authors.apps.authentication.views import RegistrationAPIView
+from authors.apps.authentication.views import LoginAPIView
 from rest_framework.test import force_authenticate
+from authors.apps.authentication.models import User
 import json
 
 class CreateCommentTestCase(TestCase):
@@ -17,11 +18,9 @@ class CreateCommentTestCase(TestCase):
         }
         }
 
-        self.request = self.factory.post('/api/users/', data = json.dumps(self.user), content_type='application/json')
-        self.response = RegistrationAPIView.as_view()(self.request)
-        self.headers = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
-        }
+        user = User.objects.create_user(self.user["user"]["username"], self.user["user"]["email"], self.user["user"]["password"])
+        user.is_verified = True
+        user.save()
 
         self.article_data = {
                 "title":"How to Survive",
@@ -29,9 +28,16 @@ class CreateCommentTestCase(TestCase):
                 "body":"This is how to survive"
             }
 
+        self.request = self.factory.post('/api/users/login/', data = json.dumps(self.user), content_type='application/json')
+        self.response = LoginAPIView.as_view()(self.request)
+        self.headers = {
+            'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
+        }
+        
 
         request = self.factory.post('api/articles', data = json.dumps(self.article_data), **self.headers, content_type = 'application/json')
         response = ArticleCreateAPIView.as_view()(request)
+
 
     def test_comment_created_successful(self):
         comment = {
