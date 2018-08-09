@@ -1,7 +1,6 @@
 from django.test import TestCase, RequestFactory
-from .views import ArticleCreateAPIView
+from authors.apps.articles.views import ArticleCreateAPIView
 from authors.apps.authentication.views import RegistrationAPIView
-from rest_framework.test import force_authenticate
 import json
 
 class CreateArticleTestCase(TestCase):

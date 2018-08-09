@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 from taggit.managers import TaggableManager
 import uuid
+from statistics import mean
 
 
 class Article(models.Model):
@@ -17,6 +18,8 @@ class Article(models.Model):
     favorited = models.BooleanField(default = False)
     favoritesCount = models.IntegerField(default = 0)
     tags = TaggableManager(blank = True)
+    rating = models.PositiveIntegerField(blank = True, editable = False, null = True)
+
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -39,3 +42,57 @@ class Article(models.Model):
 class ArticleImage(models.Model):
     article = models.ForeignKey(Article, related_name = "article_images", on_delete = models.CASCADE)
     image = models.ImageField()
+
+   
+class Rating(models.Model):
+    RATING_CHOICES = (
+    (1,1),
+    (2,2),
+    (3,3),
+    (4,4),
+    (5,5),
+    )
+    user = models.ForeignKey(User, related_name = "user_article_rating", on_delete = models.CASCADE, blank = True)
+    article = models.ForeignKey(Article, related_name = "article_ratings",on_delete = models.CASCADE, blank = True)
+    amount = models.PositiveIntegerField(choices = RATING_CHOICES)
+
+    class Meta:
+        ordering = ('-amount', )
+
+    def av_rating(self,qs_set, new_rating = None):
+        if new_rating:
+            new_qs_set_ratings = [rating.amount for rating in qs_set]
+            new_qs_set_ratings.append(new_rating)
+            return round(mean(new_qs_set_ratings))
+        qs_set_ratings = [rating.amount for rating in qs_set]
+        return round(mean(qs_set_ratings))
+
+    def save(self, *args, **kwargs):
+        rating_class = self.__class__
+        qs_exists = rating_class.objects.filter(article = self.article).filter(user = self.user)
+        if not qs_exists:
+            existing_ratings = self.article.article_ratings.all() 
+            if existing_ratings:
+                Article.objects.filter(pk = self.article.id).update(rating = self.av_rating(existing_ratings, self.amount))
+            return super(Rating, self).save(*args, **kwargs)
+        qs_exists.update(amount = self.amount)
+        ratings = self.article.article_ratings.all()
+        Article.objects.filter(pk = self.article.id).update(rating = self.av_rating(ratings))
+        return 
+
+    def __str__(self):
+        return 'Rating of {} on {} by user {}'.format(self.amount, self.article, self.user)
+class Comment(models.Model):
+    author = models.ForeignKey(User, related_name = "comment_author", on_delete = models.CASCADE)
+    article = models.ForeignKey(Article,related_name = "user_comments", on_delete = models.CASCADE, blank = True)
+    body = models.TextField()
+    created_at = models.DateTimeField(editable = False,auto_now=True)
+    updated_at  = models.DateTimeField(blank = True, null = True,auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return self.body
+
+
