@@ -67,6 +67,7 @@ class LikeArticleAPIView(APIView):
         if article.likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
             return Response(data = {"errors":{"error":"Already liked"}},status=status.HTTP_409_CONFLICT)
         article.likes.add(user_data[0])
+        article.likesCount+=1
         article.save()
         
         return Response(data = CreateArticleSerializer(article).data,status=status.HTTP_201_CREATED)
@@ -78,6 +79,7 @@ class LikeArticleAPIView(APIView):
         article = get_object_or_404(Article,slug = slug)
         if article.likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
             article.likes.remove(user_data[0])
+            article.likesCount-=1
             article.save()
             return Response(data = CreateArticleSerializer(article).data,status=status.HTTP_200_OK)
         else:

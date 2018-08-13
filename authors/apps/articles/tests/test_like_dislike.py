@@ -86,6 +86,13 @@ class LikeDislikeTestCase(TestCase):
         response = DislikeArticleAPIView.as_view()(request,**kwargs)
         self.assertEqual(response.status_code, 409)
 
+    def test_dislike_after_like(self):
+        kwargs = {"slug":"how-to-survive"}
+        request = self.factory.post('api/articles/how-to-survive/like', **self.headers)
+        response = LikeArticleAPIView.as_view()(request,**kwargs)
+        response = DislikeArticleAPIView.as_view()(self.factory.post('api/articles/how-to-survive/dislike', **self.headers),**kwargs)
+        self.assertEqual(response.status_code, 201)
+
     def test_dislike_missing_slug(self):
         request = self.factory.post('api/articles/dislike', **self.headers)
         response = DislikeArticleAPIView.as_view()(request)
