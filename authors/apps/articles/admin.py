@@ -6,7 +6,7 @@ class ArticleImageInline(admin.TabularInline):
     extra = 3
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['title','description','created_at','updated_at','rating']
+    list_display = ['title','description','author','created_at','updated_at','rating']
     inlines = [ArticleImageInline, ]
     prepopulated_fields = {'slug' : ('title',)}
 

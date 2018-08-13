@@ -6,9 +6,10 @@ from .views import (
     CommentCreateAPIView,
     LikeArticleAPIView,
     DislikeArticleAPIView,
-    FavoriteArticleAPIView
+    FavoriteArticleAPIView,
+    ListAuthorArticlesAPIView,
+    ListFollowingArticlesAPIView,
 )
-
 
 app_name = "articles"
 
@@ -19,5 +20,7 @@ urlpatterns = [
     path('articles/<slug>/like',LikeArticleAPIView.as_view()),
     path('articles/<slug>/dislike',DislikeArticleAPIView.as_view()),
     path('articles/<slug>/favorite',FavoriteArticleAPIView.as_view()),
+    path('my/articles/', ListAuthorArticlesAPIView.as_view()),
+    path('<username>/articles/', ListFollowingArticlesAPIView.as_view() ),
 ]
 

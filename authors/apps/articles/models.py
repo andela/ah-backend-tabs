@@ -10,7 +10,7 @@ from statistics import mean
 class Article(models.Model):
     title = models.CharField(max_length = 500)
     description = models.TextField()
-    slug = models.SlugField(max_length = 255)
+    slug = models.SlugField(max_length = 255, blank = True)
     body = models.TextField()
     created_at = models.DateTimeField(editable = False)
     updated_at  = models.DateTimeField(blank = True, null = True)
