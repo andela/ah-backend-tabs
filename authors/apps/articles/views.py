@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, ListAPIView
 from authors.apps.articles.serializers import CreateArticleSerializer, RateArticleSerializer,CreateCommentSerializer
-from authors.apps.articles.renderers import ArticleJSONRenderer, RateArticleJSONRenderer,CommentJSONRenderer
+from authors.apps.articles.renderers import ArticleJSONRenderer, RateArticleJSONRenderer,CommentJSONRenderer, ListArticlesJSONRenderer
 from rest_framework.views import APIView
 from .serializers import CreateArticleSerializer
 from authors.apps.authentication.models import User
@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 
 
 from authors.apps.authentication.backends import JWTAuthentication
@@ -57,7 +58,6 @@ class CommentCreateAPIView(CreateAPIView):
 class LikeArticleAPIView(APIView):
     permission_classes = (IsAuthenticated, )
     look_url_kwarg = "slug"
-
 
     def post(self,*args,**kwargs):
         jwt = JWTAuthentication()
@@ -154,5 +154,29 @@ class FavoriteArticleAPIView(APIView):
             return Response(data = CreateArticleSerializer(article).data,status=status.HTTP_200_OK)
         else:
             return Response(data = {"errors":{"error":"Not yet Favorited"}},status=status.HTTP_409_CONFLICT)
-       
+
+class ListAuthorArticlesAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CreateArticleSerializer
+    renderer_classes = (ListArticlesJSONRenderer,)
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        jwt = JWTAuthentication()
+        user_data = jwt.authenticate(self.request)
+        articles = Article.objects.filter(author = user_data[0])
+        return articles
+
+class ListFollowingArticlesAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CreateArticleSerializer
+    renderer_classes = (ListArticlesJSONRenderer,)
+    pagination_class = PageNumberPagination
+    look_url_kwarg = "username"
+
+    def get_queryset(self):
+        username = self.kwargs.get(self.look_url_kwarg)
+        author = get_object_or_404(User, username = username)
+        articles = Article.objects.filter(author = author)
+        return articles
 

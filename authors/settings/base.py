@@ -144,7 +144,7 @@ REST_FRAMEWORK = {
         'authors.apps.authentication.backends.JWTAuthentication',  
     ),   
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 1
+    'PAGE_SIZE': 5
 }
 
 EMAIL_BACKEND="djmail.backends.default.EmailBackend"

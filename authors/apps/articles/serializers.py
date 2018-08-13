@@ -13,13 +13,14 @@ class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
     def get_author(self, obj):
         user = {
             "username": obj.author.username,
-            "email": obj.author.email
+            "email": obj.author.email,
+            "bio": obj.author.bio
         }
         return user
 
     class Meta:
         model = Article
-        fields = ['title','description','body','created_at','updated_at','author','favorited','favoritesCount','likesCount','dislikesCount','tags']
+        fields = ['slug','title','description','body','created_at','updated_at','author','favorited','favoritesCount','likesCount','dislikesCount','tags']
 
 class RateArticleSerializer(serializers.ModelSerializer):
 

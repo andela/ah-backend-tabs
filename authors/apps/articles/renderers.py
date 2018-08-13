@@ -15,6 +15,17 @@ class ArticleJSONRenderer(JSONRenderer):
             'article': data,
         })
 
+class ListArticlesJSONRenderer(JSONRenderer):
+    charset = 'utf-8'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        if "results" in data:
+            data["articles"] = data.pop("results")
+
+        return json.dumps({
+            "results":data,
+        })
+
 class RateArticleJSONRenderer(JSONRenderer):
     charset = 'utf-8'
 
