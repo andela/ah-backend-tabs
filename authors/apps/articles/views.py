@@ -161,32 +161,31 @@ class FavoriteArticleAPIView(APIView):
             return Response(data={"errors": {"error": "Not yet Favorited"}}, status=status.HTTP_409_CONFLICT)
 
 
-class ListAuthorArticlesAPIView(ListAPIView):
-    permission_classes = (IsAuthenticated, )
+class SearchArticlesAPIView(ListAPIView):
     serializer_class = CreateArticleSerializer
     renderer_classes = (ListArticlesJSONRenderer,)
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
-        jwt = JWTAuthentication()
-        user_data = jwt.authenticate(self.request)
-        articles = Article.objects.filter(author=user_data[0])
-        return articles
-
-
-class ListFollowingArticlesAPIView(ListAPIView):
-    permission_classes = (IsAuthenticated, )
-    serializer_class = CreateArticleSerializer
-    renderer_classes = (ListArticlesJSONRenderer,)
-    pagination_class = PageNumberPagination
-    look_url_kwarg = "username"
-
-    def get_queryset(self):
-        username = self.kwargs.get(self.look_url_kwarg)
-        author = get_object_or_404(User, username=username)
-        articles = Article.objects.filter(author=author)
-        return articles
-
+        queryset = Article.objects.all()
+        if "title" in self.request.query_params:
+            filter_field = self.request.query_params.get('title')
+            filtered_queryset = queryset.filter(title__icontains = filter_field)
+        
+        if "author" in self.request.query_params:
+            filter_field = self.request.query_params.get('author')
+            user = get_object_or_404(User,username__icontains = filter_field)
+            filtered_queryset = queryset.filter(author = user.id)
+        if "tag" in self.request.query_params:
+            filter_field = self.request.query_params.get('tag')
+            filtered_queryset =[]
+            if filter_field is not None:
+                for article in queryset:
+                    for tag in article.tags.all():
+                        if filter_field ==tag.name:
+                            filtered_queryset.append(article)
+        return filtered_queryset
+        
 
 class UpdateArticleAPIView(UpdateAPIView):
     permission_classes = (IsAuthenticated, )
@@ -218,3 +217,5 @@ class UpdateArticleAPIView(UpdateAPIView):
             raise exceptions.APIException(e)
 
         return Response(data=self.serializer_class(updated_article).data, status=status.HTTP_201_CREATED)
+        
+        

@@ -43,4 +43,4 @@ class CommentJSONRenderer(JSONRenderer):
         return json.dumps({
             'comment': data,
         })
-        
+    
