@@ -22,11 +22,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
+    message = serializers.CharField(max_length = 255, read_only = True, default = "You were signed up successfully!")
+
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token']
+        fields = ['email', 'username', 'password', 'token', 'message']
 
     def validate_email(self, value):
         user_qs = User.objects.filter(email=value)
