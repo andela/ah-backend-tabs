@@ -17,13 +17,16 @@ class UserJSONRenderer(JSONRenderer):
             # rendering errors.
             return super(UserJSONRenderer, self).render(data)
 
+        message = data.get('message', None)
         token = data.get('token', None)
         if token is not None and isinstance(token, bytes):
             data['token'] = token.decode('utf-8')
+                    
+            if message is not None:
+                data['message'] = message
 
         # Finally, we can render our data under the "user" namespace.
         return json.dumps({
-            'user': data,
-            'message': "You were successfully registered!",
+            'user': data
         })
 
