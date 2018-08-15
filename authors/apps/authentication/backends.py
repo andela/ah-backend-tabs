@@ -45,6 +45,9 @@ class JWTAuthentication(authentication.BaseAuthentication):
         except:
             raise exceptions.AuthenticationFailed('User not recognised!')
 
+        if user.user_token != token:
+                 raise exceptions.AuthenticationFailed('User is logged out. Please log in and try again!')
+
         if not user.is_active:
             raise exceptions.AuthenticationFailed('This user is deactivated!')
 

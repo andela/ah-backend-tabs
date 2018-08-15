@@ -115,13 +115,16 @@ class LoginSerializer(serializers.Serializer):
                 'Please verify your account before proceeding.'
             )
 
+        user.user_token = user.token
+        user.save()
+
         # The `validate` method should return a dictionary of validated data.
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
         return {
             'email': user.email,
             'username': user.username,
-            'token': user.token
+            'token': user.user_token
         }
 
 
