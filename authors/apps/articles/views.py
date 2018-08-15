@@ -170,22 +170,22 @@ class SearchArticlesAPIView(ListAPIView):
         queryset = Article.objects.all()
         if "title" in self.request.query_params:
             filter_field = self.request.query_params.get('title')
-            filtered_queryset = queryset.filter(title__icontains = filter_field)
-        
+            filtered_queryset = queryset.filter(title__icontains=filter_field)
+
         if "author" in self.request.query_params:
             filter_field = self.request.query_params.get('author')
-            user = get_object_or_404(User,username__icontains = filter_field)
-            filtered_queryset = queryset.filter(author = user.id)
+            user = get_object_or_404(User, username__icontains=filter_field)
+            filtered_queryset = queryset.filter(author=user.id)
         if "tag" in self.request.query_params:
             filter_field = self.request.query_params.get('tag')
-            filtered_queryset =[]
+            filtered_queryset = []
             if filter_field is not None:
                 for article in queryset:
                     for tag in article.tags.all():
-                        if filter_field ==tag.name:
+                        if filter_field == tag.name:
                             filtered_queryset.append(article)
         return filtered_queryset
-        
+
 
 class UpdateArticleAPIView(UpdateAPIView):
     permission_classes = (IsAuthenticated, )
@@ -217,5 +217,18 @@ class UpdateArticleAPIView(UpdateAPIView):
             raise exceptions.APIException(e)
 
         return Response(data=self.serializer_class(updated_article).data, status=status.HTTP_201_CREATED)
+
+
+class DeleteArticleAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    look_url_kwarg = 'slug'
+
+    def delete(self, request, *args, **kwargs):
+        slug = self.kwargs.get(self.look_url_kwarg)
         
-        
+        article = Article.objects.filter(slug=slug).delete()
+
+        if article[0] == 0:
+            return Response({'message': 'Operation was not performed, no such article found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'message': 'Article deleted.'}, status=status.HTTP_200_OK)
