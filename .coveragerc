@@ -15,6 +15,7 @@ omit =
     *articles/models*
     */migrations/*
     */venv/*
-   *email_reg_util*
-   *reset_password_util*
+    *email_reg_util*
+    *reset_password_util*
+    *app_util*
     

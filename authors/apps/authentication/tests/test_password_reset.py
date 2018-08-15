@@ -1,7 +1,11 @@
 from django.test import TestCase, RequestFactory
 import json
 import jwt
-from authors.apps.authentication.views import SendPasswordResetEmailAPIView, ResetPasswordAPIView, RegistrationAPIView
+from authors.apps.authentication.views import (
+    SendPasswordResetEmailAPIView,
+    ResetPasswordAPIView,
+    RegistrationAPIView,)
+from authors.apps.utils.app_util import UtilClass
 from minimock import Mock
 import smtplib
 
@@ -20,20 +24,15 @@ class ResetPasswordTestCase(TestCase):
         self.password_dict = {'password': 'password1234567#',
                               'retyped_password': 'password1234567#'}
 
-        smtplib.SMTP = Mock('smtplib.SMTP')
-        smtplib.SMTP.mock_returns = Mock('smtp_connection')
+        """create user in database"""
+        self.obj = UtilClass()
+        token = self.obj.get_reg_data(self.user)
+        self.kwargs = {'token': token.data['token']}
 
+    def test_send_reset_mail(self):
         self.request = self.factory.post(
             'users/password/forgot/', data=json.dumps(self.email_dict), content_type='application/json')
         self.response = SendPasswordResetEmailAPIView.as_view()(self.request)
-
-        """create user in database"""
-        self.reg_request = self.factory.post(
-            '/api/users/', data=json.dumps(self.user), content_type='application/json')
-        self.reg_response = RegistrationAPIView.as_view()(self.reg_request)
-        self.kwargs = {'token': self.reg_response.data['token']}
-
-    def test_send_reset_mail(self):
         self.assertEqual(self.response.status_code, 200)
 
     def test_reset_password(self):
