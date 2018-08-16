@@ -4,6 +4,7 @@ from authors.apps.authentication.views import RegistrationAPIView, VerificationA
 import json
 import smtplib
 from minimock import Mock
+from authors.apps.utils.app_util import UtilClass
 
 
 class CreateArticleTestCase(TestCase):
@@ -18,18 +19,15 @@ class CreateArticleTestCase(TestCase):
                 "password": "testpass@word"
             }
         }
-        smtplib.SMTP = Mock('smtplib.SMTP', tracker=None)
-        smtplib.SMTP.mock_returns = Mock('smtp_connection')
+        self.obj = UtilClass()
+        registered_user = self.obj.get_reg_data(self.user)
+        self.obj.verify_user({"token":registered_user.data["token"]})
+        logged_in_user = self.obj.get_login_data(self.user)
    
-        self.request = self.factory.post(
-            '/api/users/', data=json.dumps(self.user), content_type='application/json')
-        self.response = RegistrationAPIView.as_view()(self.request)
 
         self.headers = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
+            'HTTP_AUTHORIZATION': 'Token ' + logged_in_user.data["token"]
         }
-        verfication_request = self.factory.put('/api/users/verify/token',content_type='application/json')
-        VerificationAPIView.as_view()(verfication_request, **{"token":self.response.data["token"]})
 
         self.article_data = {
             "title": "This is Postman",
