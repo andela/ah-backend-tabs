@@ -18,7 +18,7 @@ class UserManager(BaseUserManager):
     to create `User` objects.
     """
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password=None, fb_social_id = None, google_social_id = None, image = None, is_verified = None):
         """Create and return a `User` with an email, username and password."""
 
         if not username:
@@ -34,6 +34,12 @@ class UserManager(BaseUserManager):
             raise TypeError('Users must have an email address.')
 
         user = self.model(username=username, email=self.normalize_email(email))
+        if fb_social_id and is_verified:
+            user = self.model(username=username, email=self.normalize_email(email), fb_social_id = fb_social_id, is_verified = is_verified, image = image)
+        
+        if google_social_id and is_verified:
+            user = self.model(username=username, email=self.normalize_email(email), google_social_id = google_social_id, is_verified = is_verified, image = image)
+
         user.set_password(password)
         user.save()
 
@@ -99,9 +105,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     # A timestamp reprensenting when this object was last updated.
     updated_at = models.DateTimeField(auto_now=True)
 
+    #social auth fields
+
+    fb_social_id = models.CharField(db_index = True, max_length = 255, null = True, blank = True)
+    google_social_id = models.CharField(db_index = True, max_length = 255, null = True, blank = True)
+
+
     # More fields required by Django when specifying a custom user model.
     bio = models.CharField(max_length=255, blank=True)
-    image = models.ImageField(upload_to='profile_image', blank=True)
+    image = models.ImageField(upload_to='profile_image', blank=True, max_length = 800)
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

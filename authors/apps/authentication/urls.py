@@ -7,6 +7,8 @@ from .views import (
     VerificationAPIView, 
     SendPasswordResetEmailAPIView, 
     ResetPasswordAPIView,
+    FacebookLoginAPIView,
+    GoogleLoginAPIView,
 )
 
 app_name = "authentication"
@@ -20,4 +22,7 @@ urlpatterns = [
          SendPasswordResetEmailAPIView.as_view(), name='forgot_password'),
     path('users/password/reset/<token>',
          ResetPasswordAPIView.as_view(), name='reset_password'),
+
+    path('users/fbauth/', FacebookLoginAPIView.as_view()),
+    path('users/googleauth/', GoogleLoginAPIView.as_view()),
 ]

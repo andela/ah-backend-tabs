@@ -49,10 +49,6 @@ INSTALLED_APPS = [
     'authors.apps.follower',
     'taggit_serializer',
     'taggit',
-    
-    'oauth2_provider',
-    'social_django',
-    'rest_framework_social_oauth2',
     'djmail',
 ]
 

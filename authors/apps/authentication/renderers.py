@@ -30,3 +30,31 @@ class UserJSONRenderer(JSONRenderer):
             'user': data
         })
 
+
+class FBAuthJSONRenderer(JSONRenderer):
+    charset = 'utf-8'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        errors = data.get('errors', None)
+        if errors is not None:
+            # As mentioned about, we will let the default JSONRenderer handle
+            # rendering errors.
+            return super(FBAuthJSONRenderer, self).render(data)
+
+        data = data['fbauth_token']
+
+        return json.dumps({"user":data})
+
+class GoogleAuthJSONRenderer(JSONRenderer):
+    charset = 'utf-8'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        errors = data.get('errors', None)
+        if errors is not None:
+            # As mentioned about, we will let the default JSONRenderer handle
+            # rendering errors.
+            return super(GoogleAuthJSONRenderer, self).render(data)
+
+        data = data['googleauth_token']
+
+        return json.dumps({"user":data})
