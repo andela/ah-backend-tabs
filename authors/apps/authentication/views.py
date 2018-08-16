@@ -11,9 +11,9 @@ import jwt
 import os
 from django.contrib.auth.hashers import make_password
 
-from .renderers import UserJSONRenderer
+from .renderers import UserJSONRenderer, FBAuthJSONRenderer, GoogleAuthJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer,
+    LoginSerializer, RegistrationSerializer, UserSerializer, FacebookAPISerializer, GoogleAPISerializer,
 )
 from authors.apps.authentication.email_reg_util import SendAuthEmail
 from authors.apps.authentication.reset_password_util import ResetPasswordUtil
@@ -135,3 +135,27 @@ class ResetPasswordAPIView(UpdateAPIView):
         user.save()
 
         return Response({'message': 'your password has been changed.'}, status=status.HTTP_201_CREATED)
+
+
+class FacebookLoginAPIView(APIView):
+    permission_classes = (AllowAny, )
+    serializer_class = FacebookAPISerializer
+    renderer_classes = (FBAuthJSONRenderer,)
+
+    def post(self,request, *args, **kwargs):
+        user_data = request.data.get("user", {})
+        serializer = self.serializer_class(data = user_data)
+        serializer.is_valid(raise_exception = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+
+
+class GoogleLoginAPIView(APIView):
+    permission_classes = (AllowAny, )
+    serializer_class = GoogleAPISerializer
+    renderer_classes = (GoogleAuthJSONRenderer,)
+
+    def post(self,request, *args, **kwargs):
+        user_data = request.data.get("user", {})
+        serializer = self.serializer_class(data = user_data)
+        serializer.is_valid(raise_exception = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
