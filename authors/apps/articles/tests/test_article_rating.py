@@ -4,6 +4,7 @@ from authors.apps.authentication.views import RegistrationAPIView
 from authors.apps.articles.models import Article, Rating
 from django.shortcuts import get_object_or_404
 import json
+from authors.apps.utils.app_util import UtilClass
 
 
 class RateArticleTestCase(TestCase):
@@ -27,16 +28,24 @@ class RateArticleTestCase(TestCase):
         }
         }
 
+        self.obj = UtilClass()
+        registered_user = self.obj.get_reg_data(self.user)
+        self.obj.verify_user({"token":registered_user.data["token"]})
+        logged_in_user = self.obj.get_login_data(self.user)
+
+        registered_user_two = self.obj.get_reg_data(self.user_two)
+        self.obj.verify_user({"token":registered_user_two.data["token"]})
+        logged_in_user_two = self.obj.get_login_data(self.user_two)
+
         self.request = self.factory.post('/api/users/', data = json.dumps(self.user), content_type='application/json')
-        self.response = RegistrationAPIView.as_view()(self.request)
+       
         self.headers = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
+            'HTTP_AUTHORIZATION': 'Token ' + logged_in_user.data["token"]
         }
 
-        self.request_two = self.factory.post('/api/users/', data = json.dumps(self.user_two), content_type='application/json')
-        self.response_two = RegistrationAPIView.as_view()(self.request_two)
+        
         self.headers_two = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response_two.data["token"]
+            'HTTP_AUTHORIZATION': 'Token ' + logged_in_user_two.data["token"]
         }
 
         self.article_data = {
