@@ -142,7 +142,7 @@ class FacebookLoginAPIView(APIView):
     serializer_class = FacebookAPISerializer
     renderer_classes = (FBAuthJSONRenderer,)
 
-    def post(self,request, *args, **kwargs):
+    def post(self,request):
         user_data = request.data.get("user", {})
         serializer = self.serializer_class(data = user_data)
         serializer.is_valid(raise_exception = True)
