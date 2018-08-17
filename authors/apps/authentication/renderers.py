@@ -42,6 +42,8 @@ class FBAuthJSONRenderer(JSONRenderer):
             return super(FBAuthJSONRenderer, self).render(data)
 
         data = data['fbauth_token']
+        
+        data = json.loads(data)
 
         return json.dumps({"user":data})
 
@@ -56,5 +58,7 @@ class GoogleAuthJSONRenderer(JSONRenderer):
             return super(GoogleAuthJSONRenderer, self).render(data)
 
         data = data['googleauth_token']
+
+        data = json.loads(data)
 
         return json.dumps({"user":data})
