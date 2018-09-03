@@ -16,14 +16,18 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+from django.conf.urls.static import static
+from authors.settings.base import MEDIA_URL, MEDIA_ROOT
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('authors.apps.articles.urls')),   
+    path('api/', include('authors.apps.articles.urls')),
 
-    path('api/', include('authors.apps.authentication.urls', namespace='authentication')),
+    path('api/', include('authors.apps.authentication.urls',
+                         namespace='authentication')),
     path('api/profiles/', include('authors.apps.profiles.urls', namespace='profiles')),
-    path('api/users/', include('authors.apps.follower.urls', namespace = "follows"))
+    path('api/users/', include('authors.apps.follower.urls', namespace="follows"))
 ]
 
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

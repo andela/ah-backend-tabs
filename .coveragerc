@@ -18,4 +18,5 @@ omit =
     *email_reg_util*
     *reset_password_util*
     *app_util*
+    */media/*
     
