@@ -5,12 +5,14 @@ from authors.apps.articles.models import Article, Rating, Comment
 from taggit_serializer.serializers import (
     TagListSerializerField, TaggitSerializer)
 from django.utils import timezone
+from .models import ArticleImage
 
 
 class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     tags = TagListSerializerField(required=False)
     author = serializers.SerializerMethodField()
+    article_images = serializers.SerializerMethodField()
 
     def get_author(self, obj):
         user = {
@@ -20,10 +22,19 @@ class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
         }
         return user
 
+    def get_article_images(self, obj):
+        image_array = []
+        images = obj.article_images.all()
+
+        for image in images:
+            image_array.append(image.image.url)
+
+        return image_array
+
     class Meta:
         model = Article
         fields = ['slug', 'title', 'description', 'body', 'created_at', 'updated_at',
-                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags']
+                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags','article_images']
 
 
 class RateArticleSerializer(serializers.ModelSerializer):

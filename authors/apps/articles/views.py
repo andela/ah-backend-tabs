@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from .serializers import CreateArticleSerializer
 from authors.apps.authentication.models import User
 from authors.apps.articles.models import Article, Comment
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from authors.apps.authentication.backends import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework import status, exceptions
@@ -185,6 +185,15 @@ class SearchArticlesAPIView(ListAPIView):
                         if filter_field == tag.name:
                             filtered_queryset.append(article)
         return filtered_queryset
+
+class ListAllArticlesAPIView(ListAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = CreateArticleSerializer
+    renderer_classes = (ListArticlesJSONRenderer,)
+    pagination_class = PageNumberPagination
+    def get_queryset(self):
+        articles = Article.objects.all()
+        return articles
 
 
 class UpdateArticleAPIView(UpdateAPIView):

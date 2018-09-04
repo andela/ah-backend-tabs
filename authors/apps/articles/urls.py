@@ -10,6 +10,7 @@ from .views import (
     UpdateArticleAPIView,
     SearchArticlesAPIView,
     DeleteArticleAPIView,
+    ListAllArticlesAPIView,
 )
 
 app_name = "articles"
@@ -24,4 +25,5 @@ urlpatterns = [
     path('articles/<slug>/favorite', FavoriteArticleAPIView.as_view()),
     path('articles/search', SearchArticlesAPIView.as_view()),
     path('articles/<slug>/delete/', DeleteArticleAPIView.as_view()),
+    path('articles/all/', ListAllArticlesAPIView.as_view()),
 ]
