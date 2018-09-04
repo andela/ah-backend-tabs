@@ -8,7 +8,7 @@ class GoogleValidation:
     @staticmethod
     def validate_google_token(google_token):
 
-        CLIENT_ID = "341988301600-odl0nb10vaim96gsdhpa6vun7iog5pl0.apps.googleusercontent.com"
+        CLIENT_ID = os.getenv('CLIENT_ID')
 
         try:
             idinfo = id_token.verify_oauth2_token(google_token, requests.Request(), CLIENT_ID)
