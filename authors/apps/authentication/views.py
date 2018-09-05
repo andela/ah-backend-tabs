@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import HttpResponseRedirect
+from rest_framework import exceptions
 from datetime import datetime, timedelta
 
 from authors.settings.base import SECRET_KEY
@@ -106,13 +107,22 @@ class VerificationAPIView(UpdateAPIView):
 class SendPasswordResetEmailAPIView(APIView):
     def post(self, request):
         email = request.data.get('email')
+
+        try:
+            User.objects.get(email=email)
+        except:
+            raise exceptions.AuthenticationFailed('Email not found!')
+
         dt = datetime.now()+timedelta(days=1)
         token = jwt.encode({'email': email, 'exp': int(
-            dt.strftime('%s'))}, SECRET_KEY, 'HS256')
+            dt.strftime('%s'))}, SECRET_KEY, 'HS256').decode('utf-8')
+
+        callback = request.data.get('callbackurl')
+
         email_obj = ResetPasswordUtil()
         email_obj.send_mail(request, os.environ.get(
-            'EMAIL_HOST_USER'), email, token)
-        return Response({'message': 'a link has been sent to your email.', 'token': token}, status=status.HTTP_200_OK)
+            'EMAIL_HOST_USER'), email, callback, token)
+        return Response({'message': 'a link has been sent to your email.'}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordAPIView(UpdateAPIView):
