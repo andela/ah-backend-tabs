@@ -9,7 +9,7 @@ from authors.settings.base import SECRET_KEY
 from rest_framework import authentication, exceptions
 from minimock import Mock
 import smtplib
-
+from authors.apps.utils.app_util import UtilClass
 
 class BackendsTestCase(TestCase):
     def setUp(self):
@@ -22,19 +22,21 @@ class BackendsTestCase(TestCase):
                 "password": "testpass@word"
             }
         }
-        smtplib.SMTP = Mock('smtplib.SMTP')
-        smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
-    def make_token(self, user):
-        request = self.factory.post(
-            '/api/users/', data=json.dumps(user), content_type='application/json')
-        response = RegistrationAPIView.as_view()(request)
-        return response.data['token']
+        self.obj = UtilClass()
+        registered_user = self.obj.get_reg_data(self.user)
+        self.obj.verify_user({"token":registered_user.data["token"]})
+        self.logged_in_user = self.obj.get_login_data(self.user)
+
+        self.headers = {
+            'HTTP_AUTHORIZATION': 'Token ' + self.logged_in_user.data["token"]
+        }
+
 
     def test_token_validity(self):
         request = self.factory.post(
             '/api/users/', content_type='application/json', data=json.dumps(self.user))
-        response = RegistrationAPIView.as_view()(request)
+        response = self.logged_in_user
         self.assertEquals(
             self.user['user']['username'], response.data['username'])
 
@@ -55,7 +57,7 @@ class BackendsTestCase(TestCase):
 
     def test_auth_array_size_is_greater_than_two(self):
         headers = {
-            'HTTP_AUTHORIZATION': 'Token Bearer ' + self.make_token(self.user)
+            'HTTP_AUTHORIZATION': 'Token Bearer ' + self.logged_in_user.data["token"]
         }
         request = self.factory.post(
             '/api/users/', **headers, content_type='application/json', data=json.dumps(self.user))
@@ -64,7 +66,7 @@ class BackendsTestCase(TestCase):
 
     def test_token_prefix_validity(self):
         headers = {
-            'HTTP_AUTHORIZATION': 'Bearer ' + self.make_token(self.user)
+            'HTTP_AUTHORIZATION': 'Bearer ' + self.logged_in_user.data["token"]
         }
         request = self.factory.post(
             '/api/users/', **headers, content_type='application/json', data=json.dumps(self.user))
@@ -72,14 +74,10 @@ class BackendsTestCase(TestCase):
         self.assertEqual(None, response)
 
     def test_authenticate_method(self):
-        token = self.make_token(self.user)
-        headers = {
-            'HTTP_AUTHORIZATION': 'Token ' + token
-        }
         request = self.factory.post(
-            '/api/users/', **headers, content_type='application/json', data=json.dumps(self.user))
+            '/api/users/', **self.headers, content_type='application/json', data=json.dumps(self.user))
         response = self.auth_obj.authenticate(request)
-        expected_response = (response[0], token)
+        expected_response = (response[0], self.logged_in_user.data["token"])
         self.assertEqual(response, expected_response)
 
     def test_authentication_failed(self):

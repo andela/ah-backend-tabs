@@ -7,6 +7,7 @@ from minimock import Mock
 from authors.apps.follower.models import Connect
 from authors.apps.authentication.models import User
 from django.shortcuts import get_object_or_404
+from authors.apps.utils.app_util import UtilClass
 
 
 class UserFollowingTestCase(TestCase):
@@ -29,31 +30,26 @@ class UserFollowingTestCase(TestCase):
                 "password": "testpass@word"
             }
         }
-        smtplib.SMTP = Mock('smtplib.SMTP', tracker=None)
-        smtplib.SMTP.mock_returns = Mock('smtp_connection')
-   
-        self.request = self.factory.post(
-            '/api/users/', data=json.dumps(self.user), content_type='application/json')
-        self.response = RegistrationAPIView.as_view()(self.request)
 
-        self.request_two = self.factory.post(
-            '/api/users/', data=json.dumps(self.user_two), content_type='application/json')
-        self.response_two = RegistrationAPIView.as_view()(self.request_two)
+        self.obj = UtilClass()
+        registered_user = self.obj.get_reg_data(self.user)
+        self.obj.verify_user({"token":registered_user.data["token"]})
+        logged_in_user = self.obj.get_login_data(self.user)
+
+        registered_user_two = self.obj.get_reg_data(self.user_two)
+        self.obj.verify_user({"token":registered_user_two.data["token"]})
+        logged_in_user_two = self.obj.get_login_data(self.user_two)
 
         self.headers = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]
+            'HTTP_AUTHORIZATION': 'Token ' + logged_in_user.data["token"]
         }
 
+        
         self.headers_two = {
-            'HTTP_AUTHORIZATION': 'Token ' + self.response_two.data["token"]
+            'HTTP_AUTHORIZATION': 'Token ' + logged_in_user_two.data["token"]
         }
 
-        verfication_request = self.factory.put('/api/users/verify/token',content_type='application/json')
-        VerificationAPIView.as_view()(verfication_request, **{"token":self.response.data["token"]})
-
-        verfication_request_two = self.factory.put('/api/users/verify/token',content_type='application/json')
-        VerificationAPIView.as_view()(verfication_request_two, **{"token":self.response_two.data["token"]})
-
+        
     def test_user_follow_success(self):
         request_follow = self.factory.post('/api/users/tester2/follow/', **self.headers, content_type = 'application/json')
         response_follow = FollowAPIView().as_view()(request_follow, **{"username":"tester2"})
@@ -148,5 +144,4 @@ class UserFollowingTestCase(TestCase):
         self.assertEqual(response_get_following.data["results"][0]["username"], "tester2")
         self.assertEqual(response_get_following.status_code, 200)
    
-
     

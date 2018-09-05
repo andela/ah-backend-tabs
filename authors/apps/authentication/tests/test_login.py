@@ -2,8 +2,6 @@ from django.test import TestCase, RequestFactory
 from authors.apps.authentication.views import LoginAPIView, RegistrationAPIView, VerificationAPIView
 from authors.apps.utils.app_util import UtilClass
 import json
-from minimock import Mock
-import smtplib
 
 
 class LoginTestCase(TestCase):
@@ -16,6 +14,7 @@ class LoginTestCase(TestCase):
                 "username": "rutale"
             }
         }
+
         self.obj = UtilClass()
         self.reg_data = self.obj.get_reg_data(self.user)
         self.headers = {
@@ -36,6 +35,7 @@ class LoginTestCase(TestCase):
             }
         }
         response = self.obj.get_login_data(user)
+        
         self.assertIn('A user with this email and password was not found.',
                       response.data["errors"]["error"][0])
         self.assertEqual(response.status_code, 400)

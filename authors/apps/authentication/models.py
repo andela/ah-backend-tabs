@@ -113,7 +113,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # More fields required by Django when specifying a custom user model.
     bio = models.CharField(max_length=255, blank=True)
-    image = models.ImageField(upload_to='profile_image', blank=True, max_length = 800)
+    image = models.ImageField(upload_to='profile_image', blank=True)
+    user_token = models.CharField(max_length=255, blank=True)
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.
@@ -164,4 +165,5 @@ class User(AbstractBaseUser, PermissionsMixin):
             'email': self.email
         }, settings.SECRET_KEY, algorithm='HS256')
         return token.decode('utf-8')
+
 

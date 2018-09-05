@@ -17,6 +17,7 @@ from .serializers import (
 )
 from authors.apps.authentication.email_reg_util import SendAuthEmail
 from authors.apps.authentication.reset_password_util import ResetPasswordUtil
+from authors.apps.authentication.backends import JWTAuthentication
 
 
 class RegistrationAPIView(APIView):
@@ -58,6 +59,19 @@ class LoginAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class LogoutAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = LoginSerializer
+
+    def post(self, *args, **kwargs):
+        jwt = JWTAuthentication()
+        user_data = jwt.authenticate(self.request)
+        user = User.objects.filter(email=user_data[0])[0]
+        user.user_token = ""
+        user.save()
+
+        return Response(data={"message":"User has been logged out."}, status=status.HTTP_200_OK)
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)

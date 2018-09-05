@@ -29,3 +29,4 @@ class UtilClass():
             "/api/users/login", data=json.dumps(user), content_type='application/json')
         response = LoginAPIView.as_view()(request)
         return response
+
