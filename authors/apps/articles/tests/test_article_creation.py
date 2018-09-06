@@ -16,14 +16,14 @@ class CreateArticleTestCase(TestCase):
             "user": {
                 "email": "test@gmail.com",
                 "username": "tester",
-                "password": "testpass@word"
+                "password": "testpass@word",
+                "callbackurl": ""
             }
         }
         self.obj = UtilClass()
         registered_user = self.obj.get_reg_data(self.user)
-        self.obj.verify_user({"token":registered_user.data["token"]})
+        self.obj.verify_user({"token": registered_user.data["token"]})
         logged_in_user = self.obj.get_login_data(self.user)
-   
 
         self.headers = {
             'HTTP_AUTHORIZATION': 'Token ' + logged_in_user.data["token"]
@@ -43,7 +43,7 @@ class CreateArticleTestCase(TestCase):
         response = ArticleCreateAPIView.as_view()(request)
         self.assertEqual("This is Postman", response.data["title"])
         self.assertEqual(
-            {"username": "tester", "email": "test@gmail.com","bio":""}, response.data["author"])
+            {"username": "tester", "email": "test@gmail.com", "bio": ""}, response.data["author"])
         self.assertEqual(2, len(response.data["tags"]))
         self.assertEqual(response.status_code, 201)
 

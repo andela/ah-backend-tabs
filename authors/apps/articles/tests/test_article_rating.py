@@ -16,7 +16,8 @@ class RateArticleTestCase(TestCase):
             "user" : {
             "email":"test@gmail.com",
             "username":"tester",
-            "password":"testpass@word"
+            "password":"testpass@word",
+            "callbackurl":""
         }
         }
 
@@ -24,7 +25,8 @@ class RateArticleTestCase(TestCase):
             "user" : {
             "email":"test2@gmail.com",
             "username":"tester2",
-            "password":"testpass@word"
+            "password":"testpass@word",
+            "callbackurl":""
         }
         }
 

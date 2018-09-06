@@ -23,7 +23,8 @@ class DeleteArticleTestCase(TestCase):
         }
         self.user = {'user': {'email': 'allan.guwatudde@andela.com',
                               'username': 'testusername7',
-                              'password': 'testpassword1234567#'
+                              'password': 'testpassword1234567#',
+                              'callbackurl':''
                               }
                      }
 

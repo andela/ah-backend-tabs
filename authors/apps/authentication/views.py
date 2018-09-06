@@ -3,6 +3,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView, Update
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import HttpResponseRedirect
 from datetime import datetime, timedelta
 
 from authors.settings.base import SECRET_KEY
@@ -36,7 +37,7 @@ class RegistrationAPIView(APIView):
         serializer.save()
         email_obj = SendAuthEmail()
         email_obj.send_reg_email(request,
-                                 os.environ.get('EMAIL_HOST_USER'), serializer.data['email'], serializer.data['token'])
+                                 os.environ.get('EMAIL_HOST_USER'), serializer.data['email'], user['callbackurl'], serializer.data['token'])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -88,20 +89,18 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
 class VerificationAPIView(UpdateAPIView):
     permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
     look_url_kwarg = 'token'
 
-    def update(self, request, *args, **kwargs):
+    def get_object(self):
+        return
+
+    def get(self, request, *args, **kwargs):
         token = self.kwargs.get(self.look_url_kwarg)
         decoded_token = jwt.decode(token, SECRET_KEY, 'HS256')
 
         User.objects.filter(pk=decoded_token['id']).update(is_verified=True)
-        user = User.objects.filter(pk=decoded_token['id']).values(
-            'username', 'is_verified')
-
-        user_dict = {'username': user[0]['username'],
-                     'is_verified': user[0]['is_verified']}
-
-        return Response(user_dict, status=status.HTTP_200_OK)
+        return HttpResponseRedirect(decoded_token['callback'])
 
 
 class SendPasswordResetEmailAPIView(APIView):
@@ -142,11 +141,11 @@ class FacebookLoginAPIView(APIView):
     serializer_class = FacebookAPISerializer
     renderer_classes = (FBAuthJSONRenderer,)
 
-    def post(self,request):
+    def post(self, request):
         user_data = request.data.get("user", {})
-        serializer = self.serializer_class(data = user_data)
-        serializer.is_valid(raise_exception = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        serializer = self.serializer_class(data=user_data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GoogleLoginAPIView(APIView):
@@ -154,8 +153,8 @@ class GoogleLoginAPIView(APIView):
     serializer_class = GoogleAPISerializer
     renderer_classes = (GoogleAuthJSONRenderer,)
 
-    def post(self,request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         user_data = request.data.get("user", {})
-        serializer = self.serializer_class(data = user_data)
-        serializer.is_valid(raise_exception = True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        serializer = self.serializer_class(data=user_data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
