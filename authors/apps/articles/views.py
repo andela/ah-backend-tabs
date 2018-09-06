@@ -176,6 +176,11 @@ class SearchArticlesAPIView(ListAPIView):
             filter_field = self.request.query_params.get('author')
             user = get_object_or_404(User, username__icontains=filter_field)
             filtered_queryset = queryset.filter(author=user.id)
+
+        if "slug" in self.request.query_params:
+            filter_field = self.request.query_params.get('slug')
+            filtered_queryset = queryset.filter(slug=filter_field)
+
         if "tag" in self.request.query_params:
             filter_field = self.request.query_params.get('tag')
             filtered_queryset = []

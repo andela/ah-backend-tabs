@@ -61,6 +61,16 @@ class SearchArticleTestCase(TestCase):
         response = SearchArticlesAPIView.as_view()(request)
         self.assertEqual(response.data["count"], 0)
 
+    def test_search_by_slug_normal(self):
+        request = self.factory.get('api/articles/search?slug=how-to-survive')
+        response = SearchArticlesAPIView.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_search_by_slug_non_existent(self):
+        request = self.factory.get('api/articles/search?slug=XYZ')
+        response = SearchArticlesAPIView.as_view()(request)
+        self.assertEqual(response.data["count"], 0)
+
     def test_search_by_tag_normal(self):
             request = self.factory.get('api/articles/search?tag=test')
             response = SearchArticlesAPIView.as_view()(request)
