@@ -21,7 +21,8 @@ class ResetPasswordTestCase(TestCase):
                 "callbackurl": ""
             }
         }
-        self.email_dict = {'email': 'teste@gmail.com'}
+        self.email_dict = {'email': 'test@gmail.com'}
+        self.wrong_email_dict = {'email': 'teste@gmail.com'}
         self.password_dict = {'password': 'password1234567#',
                               'retyped_password': 'password1234567#'}
 
@@ -35,6 +36,12 @@ class ResetPasswordTestCase(TestCase):
             'users/password/forgot/', data=json.dumps(self.email_dict), content_type='application/json')
         self.response = SendPasswordResetEmailAPIView.as_view()(self.request)
         self.assertEqual(self.response.status_code, 200)
+
+    def test_send_reset_mail_fail(self):
+        self.request = self.factory.post(
+            'users/password/forgot/', data=json.dumps(self.wrong_email_dict), content_type='application/json')
+        self.response = SendPasswordResetEmailAPIView.as_view()(self.request)
+        self.assertEqual(self.response.status_code, 403)
 
     def test_reset_password(self):
         self.request = self.factory.put(
