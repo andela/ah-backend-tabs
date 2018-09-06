@@ -11,7 +11,7 @@ env:
   - DJANGO_VERSION=2.0.7
 
 before_script:
-  - psql -c 'CREATE DATABASE test_db;' -U postgres
+  - psql -c 'CREATE DATABASE haven_db;' -U postgres
 
  
 install:
