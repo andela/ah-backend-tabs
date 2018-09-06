@@ -1,13 +1,8 @@
 from django.contrib import admin, messages
-from .models import Article, ArticleImage, Rating
-
-class ArticleImageInline(admin.TabularInline):
-    model = ArticleImage
-    extra = 3
+from .models import Article, Rating
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ['title','description','author','created_at','updated_at','rating']
-    inlines = [ArticleImageInline, ]
     prepopulated_fields = {'slug' : ('title',)}
 
 class ArticleRating(admin.ModelAdmin):

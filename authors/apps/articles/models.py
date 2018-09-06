@@ -27,6 +27,7 @@ class Article(models.Model):
     dislikesCount = models.IntegerField(default=0)
     favorites = models.ManyToManyField(
         User, related_name="favorites", blank=True)
+    image = models.TextField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -46,12 +47,6 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class ArticleImage(models.Model):
-    article = models.ForeignKey(
-        Article, related_name="article_images", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='article_images/%Y/%m/%d', blank=True)
 
 
 class Rating(models.Model):
