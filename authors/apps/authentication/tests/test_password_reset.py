@@ -17,7 +17,8 @@ class ResetPasswordTestCase(TestCase):
             "user": {
                 "email": "test@gmail.com",
                 "username": "tester",
-                "password": "testpass@word"
+                "password": "testpass@word",
+                "callbackurl": ""
             }
         }
         self.email_dict = {'email': 'teste@gmail.com'}

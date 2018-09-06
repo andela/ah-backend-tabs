@@ -19,10 +19,9 @@ class UtilClass():
         return response
 
     def verify_user(self, kwargs={}):
-        request = self.factory.put(
+        request = self.factory.get(
             '/api/users/verify/', content_type='application/json')
-        response = VerificationAPIView.as_view()(request, **kwargs)
-        return response.data
+        VerificationAPIView.as_view()(request, **kwargs)
 
     def get_login_data(self, user):
         request = self.factory.post(

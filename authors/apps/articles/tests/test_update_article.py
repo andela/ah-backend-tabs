@@ -23,12 +23,13 @@ class UpdateArticleTestCase(TestCase):
         }
         self.user = {'user': {'email': 'allan.guwatudde@andela.com',
                               'username': 'testusername7',
-                              'password': 'testpassword1234567#'
+                              'password': 'testpassword1234567#',
+                              'callbackurl': ''
                               }
                      }
         self.obj = UtilClass()
         registered_user = self.obj.get_reg_data(self.user)
-        self.obj.verify_user({"token":registered_user.data["token"]})
+        self.obj.verify_user({"token": registered_user.data["token"]})
         logged_in_user = self.obj.get_login_data(self.user)
 
         self.headers = {
@@ -36,7 +37,6 @@ class UpdateArticleTestCase(TestCase):
         }
 
         self.slug = self.create_article()
-
 
     def create_article(self):
         request = self.factory.post(

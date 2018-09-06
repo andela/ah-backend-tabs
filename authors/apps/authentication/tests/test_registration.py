@@ -15,7 +15,8 @@ class RegisterUserTestCase(TestCase):
             "user": {
                 "email": "test@gmail.com",
                 "username": "tester",
-                "password": "testpass@word"
+                "password": "testpass@word",
+                "callbackurl":""
             }
         }
         self.obj = UtilClass()

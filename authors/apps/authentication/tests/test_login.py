@@ -13,7 +13,8 @@ class LoginTestCase(TestCase):
             "user": {
                 "email": "rutale@gmail.com",
                 "password": "rutale1234*",
-                "username": "rutale"
+                "username": "rutale",
+                "callbackurl":""
             }
         }
         self.obj = UtilClass()

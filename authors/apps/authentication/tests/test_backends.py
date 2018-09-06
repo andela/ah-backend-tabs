@@ -19,7 +19,8 @@ class BackendsTestCase(TestCase):
             "user": {
                 "email": "phillip.seryazi@andela.com",
                 "username": "tester",
-                "password": "testpass@word"
+                "password": "testpass@word",
+                "callbackurl":""
             }
         }
         smtplib.SMTP = Mock('smtplib.SMTP')

@@ -26,7 +26,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
-    message = serializers.CharField(max_length = 255, read_only = True, default = "You were signed up successfully!")
+    message = serializers.CharField(
+        max_length=255, read_only=True, default="You were signed up successfully!")
 
     class Meta:
         model = User
@@ -180,69 +181,73 @@ class UserSerializer(serializers.ModelSerializer):
 
 class FacebookAPISerializer(serializers.Serializer):
     fbauth_token = serializers.CharField(max_length=800)
-    email = serializers.EmailField(read_only = True)
-    username = serializers.CharField(max_length = 255, read_only = True)
+    email = serializers.EmailField(read_only=True)
+    username = serializers.CharField(max_length=255, read_only=True)
     token = token = serializers.CharField(max_length=255, read_only=True)
-    message = serializers.CharField(max_length = 255, read_only = True)
+    message = serializers.CharField(max_length=255, read_only=True)
 
     def validate_fbauth_token(self, fbauth_token):
-        
+
         fb_user_info = FacebookValidation.validate_facebook_token(fbauth_token)
 
         user_fb_social_id = fb_user_info["id"]
 
-        qs = User.objects.filter(fb_social_id = user_fb_social_id)
+        qs = User.objects.filter(fb_social_id=user_fb_social_id)
 
         if not qs:
-            data = {"username":fb_user_info["name"],"email":fb_user_info["email"],"fb_social_id":fb_user_info["id"], "image":fb_user_info["picture"]["data"]["url"],"is_verified":True}
+            data = {"username": fb_user_info["name"], "email": fb_user_info["email"],
+                    "fb_social_id": fb_user_info["id"], "image": fb_user_info["picture"]["data"]["url"], "is_verified": True}
             User.objects.create_user(**data)
-            new_user = User.objects.filter(fb_social_id = user_fb_social_id)
+            new_user = User.objects.filter(fb_social_id=user_fb_social_id)
             return json.dumps({
-                    'email':new_user[0].email,
-                    'username':new_user[0].username,
-                    'token': new_user[0].token,
-                    'message': 'You signed up with Facebook!'
+                'email': new_user[0].email,
+                'username': new_user[0].username,
+                'token': new_user[0].token,
+                'message': 'You signed up with Facebook!'
             })
 
-        #update email incase user changed their fb email
+        # update email incase user changed their fb email
 
-        qs.update(email = fb_user_info["email"])
+        qs.update(email=fb_user_info["email"])
 
         return json.dumps({
-                'email':qs[0].email,
-                'username':qs[0].username,
-                'token': qs[0].token
-            })
+            'email': qs[0].email,
+            'username': qs[0].username,
+            'token': qs[0].token
+        })
+
 
 class GoogleAPISerializer(serializers.Serializer):
     googleauth_token = serializers.CharField()
 
     def validate_googleauth_token(self, googleauth_token):
-        
-        google_user_info = GoogleValidation.validate_google_token(googleauth_token)
+
+        google_user_info = GoogleValidation.validate_google_token(
+            googleauth_token)
 
         google_email = google_user_info["email"]
 
         user_google_social_id = google_user_info["sub"]
 
-        qs = User.objects.filter(email = google_email)
+        qs = User.objects.filter(email=google_email)
 
         if not qs:
-            data = {"username":google_user_info["family_name"],"email":google_user_info["email"],"google_social_id":google_user_info["sub"], "image":google_user_info["picture"],"is_verified":google_user_info["email_verified"]}
+            data = {"username": google_user_info["family_name"], "email": google_user_info["email"], "google_social_id":
+                    google_user_info["sub"], "image": google_user_info["picture"], "is_verified": google_user_info["email_verified"]}
             User.objects.create_user(**data)
-            new_user = User.objects.filter(google_social_id = user_google_social_id)
+            new_user = User.objects.filter(
+                google_social_id=user_google_social_id)
             return json.dumps({
-                    'email':new_user[0].email,
-                    'username':new_user[0].username,
-                    'token': new_user[0].token,
-                    'message': 'You signed up with Google!'
+                'email': new_user[0].email,
+                'username': new_user[0].username,
+                'token': new_user[0].token,
+                'message': 'You signed up with Google!'
             })
-        qs.update(google_social_id = google_user_info["sub"], is_verified = True)
+        qs.update(google_social_id=google_user_info["sub"], is_verified=True)
 
         return json.dumps({
-                'email':qs[0].email,
-                'username':qs[0].username,
-                'token': qs[0].token
-            })
-
+            'email': qs[0].email,
+            'username': qs[0].username,
+            'token': qs[0].token
+        })
 
