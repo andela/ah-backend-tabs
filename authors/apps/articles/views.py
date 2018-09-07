@@ -20,6 +20,7 @@ from authors.apps.authentication.backends import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 import json
+import re
 
 
 class ArticleCreateAPIView(CreateAPIView):
@@ -170,10 +171,12 @@ class SearchArticlesAPIView(ListAPIView):
         queryset = Article.objects.all()
         if "title" in self.request.query_params:
             filter_field = self.request.query_params.get('title')
+            filter_field = re.sub('-', ' ', filter_field)
             filtered_queryset = queryset.filter(title__icontains=filter_field)
 
         if "author" in self.request.query_params:
             filter_field = self.request.query_params.get('author')
+            filter_field = re.sub('-', ' ', filter_field)
             user = get_object_or_404(User, username__icontains=filter_field)
             filtered_queryset = queryset.filter(author=user.id)
 
@@ -183,6 +186,7 @@ class SearchArticlesAPIView(ListAPIView):
 
         if "tag" in self.request.query_params:
             filter_field = self.request.query_params.get('tag')
+            filter_field = re.sub('-', ' ', filter_field)
             filtered_queryset = []
             if filter_field is not None:
                 for article in queryset:
@@ -191,11 +195,13 @@ class SearchArticlesAPIView(ListAPIView):
                             filtered_queryset.append(article)
         return filtered_queryset
 
+
 class ListAllArticlesAPIView(ListAPIView):
     permission_classes = (AllowAny, )
     serializer_class = CreateArticleSerializer
     renderer_classes = (ListArticlesJSONRenderer,)
     pagination_class = PageNumberPagination
+
     def get_queryset(self):
         articles = Article.objects.all()
         return articles
@@ -239,7 +245,7 @@ class DeleteArticleAPIView(APIView):
 
     def delete(self, request, *args, **kwargs):
         slug = self.kwargs.get(self.look_url_kwarg)
-        
+
         article = Article.objects.filter(slug=slug).delete()
 
         if article[0] == 0:

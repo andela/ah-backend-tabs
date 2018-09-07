@@ -21,7 +21,7 @@ class Follow_Follower_ListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username','email']
+        fields = ['username','image']
 
 
         
