@@ -12,7 +12,7 @@ class UpdateSerializer(serializers.ModelSerializer):
     def update(self,instance,validated_data):
         instance.username = validated_data.get('username',instance.username)
         instance.bio = validated_data.get('bio', instance.bio)
-        instance.image = validated_data.get('file',instance.image)
+        instance.image = validated_data.get('image',instance.image)
         instance.updated_at = timezone.now
         instance.save()
         return instance
