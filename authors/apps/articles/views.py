@@ -60,6 +60,16 @@ class CommentCreateAPIView(CreateAPIView):
         serializer.save(
             author=user_data[0], article=get_object_or_404(Article, slug=slug))
 
+class GetAllCommentsAPIView(ListAPIView):
+    serializer_class = CreateCommentSerializer
+    pagination_class = PageNumberPagination
+    look_url_kwarg = "slug"
+
+    def get_queryset(self):
+        slug = self.kwargs.get(self.look_url_kwarg)
+        article = Article.objects.filter(slug = slug)
+        comments = article[0].user_comments.all()
+        return comments
 
 class LikeArticleAPIView(APIView):
     permission_classes = (IsAuthenticated, )

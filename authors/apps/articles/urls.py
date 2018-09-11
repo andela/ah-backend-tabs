@@ -11,6 +11,7 @@ from .views import (
     SearchArticlesAPIView,
     DeleteArticleAPIView,
     ListAllArticlesAPIView,
+    GetAllCommentsAPIView,
 )
 
 app_name = "articles"
@@ -26,4 +27,5 @@ urlpatterns = [
     path('articles/search', SearchArticlesAPIView.as_view()),
     path('articles/<slug>/delete/', DeleteArticleAPIView.as_view()),
     path('articles/all/', ListAllArticlesAPIView.as_view()),
+    path('articles/<slug>/all/comments/', GetAllCommentsAPIView.as_view()),
 ]

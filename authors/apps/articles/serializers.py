@@ -16,7 +16,8 @@ class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
         user = {
             "username": obj.author.username,
             "email": obj.author.email,
-            "bio": obj.author.bio
+            "bio": obj.author.bio,
+            "image":obj.author.image
         }
         return user
 
@@ -55,6 +56,7 @@ class CreateCommentSerializer(serializers.ModelSerializer):
             "username": obj.author.username,
             "email": obj.author.email,
             "bio": obj.author.bio,
+            "image": obj.author.image
         }
         return author
 
