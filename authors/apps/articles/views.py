@@ -61,6 +61,7 @@ class CommentCreateAPIView(CreateAPIView):
             author=user_data[0], article=get_object_or_404(Article, slug=slug))
 
 class GetAllCommentsAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
     serializer_class = CreateCommentSerializer
     pagination_class = PageNumberPagination
     look_url_kwarg = "slug"
@@ -70,6 +71,15 @@ class GetAllCommentsAPIView(ListAPIView):
         article = Article.objects.filter(slug = slug)
         comments = article[0].user_comments.all()
         return comments
+
+class GetLikesandDislikesAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    look_url_kwarg = "slug"
+
+    def get(self, *args, **kwargs):
+        slug = self.kwargs.get(self.look_url_kwarg)
+        article = Article.objects.filter(slug = slug)
+        return Response({"likes":article[0].likesCount, "dislikes":article[0].dislikesCount},status = status.HTTP_200_OK)
 
 class LikeArticleAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -82,10 +92,16 @@ class LikeArticleAPIView(APIView):
         article = get_object_or_404(Article, slug=slug)
         if article.likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
             return Response(data={"errors": {"error": "Already liked"}}, status=status.HTTP_409_CONFLICT)
+        if article.dislikes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+            article.dislikes.remove(user_data[0])
+            article.dislikesCount -= 1
+            article.likes.add(user_data[0])
+            article.likesCount += 1
+            article.save()
+            return Response(data=CreateArticleSerializer(article).data, status=status.HTTP_201_CREATED)
         article.likes.add(user_data[0])
         article.likesCount += 1
         article.save()
-
         return Response(data=CreateArticleSerializer(article).data, status=status.HTTP_201_CREATED)
 
     def delete(self, *args, **kwargs):
@@ -116,11 +132,14 @@ class DislikeArticleAPIView(APIView):
 
         if article.likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
             article.likes.remove(user_data[0])
-
+            article.likesCount -= 1
+            article.dislikes.add(user_data[0])
+            article.dislikesCount += 1
+            article.save()
+            return Response(data=CreateArticleSerializer(article).data, status=status.HTTP_201_CREATED)
         article.dislikes.add(user_data[0])
         article.dislikesCount += 1
         article.save()
-
         return Response(data=CreateArticleSerializer(article).data, status=status.HTTP_201_CREATED)
 
     def delete(self, *args, **kwargs):
