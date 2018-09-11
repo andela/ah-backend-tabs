@@ -13,6 +13,7 @@ from .views import (
     ListAllArticlesAPIView,
     GetAllCommentsAPIView,
     GetLikesandDislikesAPIView,
+    GetArticleAverageRatingAPIView,
 )
 
 app_name = "articles"
@@ -30,4 +31,5 @@ urlpatterns = [
     path('articles/all/', ListAllArticlesAPIView.as_view()),
     path('articles/<slug>/all/comments/', GetAllCommentsAPIView.as_view()),
     path('articles/<slug>/likes/dislikes/', GetLikesandDislikesAPIView.as_view()),
+    path('articles/<slug>/average-rating/', GetArticleAverageRatingAPIView.as_view()),
 ]

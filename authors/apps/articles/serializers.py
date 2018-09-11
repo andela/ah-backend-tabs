@@ -24,7 +24,7 @@ class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ['slug', 'title', 'description', 'body', 'created_at', 'updated_at',
-                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags','image']
+                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags','image','rating']
 
 
 class RateArticleSerializer(serializers.ModelSerializer):
@@ -40,7 +40,14 @@ class RateArticleSerializer(serializers.ModelSerializer):
         return user
 
     def get_article(self, obj):
-        return obj.article.title
+        article = Article.objects.filter(slug = obj.article.slug)
+        rating = article[0].rating
+        article = {
+            "title": obj.article.title,
+            "slug": obj.article.slug,
+            "averageRating": rating
+        }
+        return article
 
     class Meta:
         model = Rating
