@@ -78,17 +78,21 @@ class Rating(models.Model):
         rating_class = self.__class__
         qs_exists = rating_class.objects.filter(
             article=self.article).filter(user=self.user)
-        if not qs_exists:
+        if len(qs_exists) == 0:
             existing_ratings = self.article.article_ratings.all()
             if existing_ratings:
                 Article.objects.filter(pk=self.article.id).update(
                     rating=self.av_rating(existing_ratings, self.amount))
+                return super(Rating, self).save(*args, **kwargs)
+            article = Article.objects.get(pk=self.article.id)
+            article.rating = self.amount
+            article.save()
             return super(Rating, self).save(*args, **kwargs)
         qs_exists.update(amount=self.amount)
         ratings = self.article.article_ratings.all()
         Article.objects.filter(pk=self.article.id).update(
             rating=self.av_rating(ratings))
-        return
+        return 
 
     def __str__(self):
         return 'Rating of {} on {} by user {}'.format(self.amount, self.article, self.user)

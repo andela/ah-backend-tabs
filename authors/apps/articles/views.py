@@ -61,7 +61,7 @@ class CommentCreateAPIView(CreateAPIView):
             author=user_data[0], article=get_object_or_404(Article, slug=slug))
 
 class GetAllCommentsAPIView(ListAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     serializer_class = CreateCommentSerializer
     pagination_class = PageNumberPagination
     look_url_kwarg = "slug"
@@ -73,13 +73,24 @@ class GetAllCommentsAPIView(ListAPIView):
         return comments
 
 class GetLikesandDislikesAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     look_url_kwarg = "slug"
 
     def get(self, *args, **kwargs):
         slug = self.kwargs.get(self.look_url_kwarg)
         article = Article.objects.filter(slug = slug)
         return Response({"likes":article[0].likesCount, "dislikes":article[0].dislikesCount},status = status.HTTP_200_OK)
+
+class GetArticleAverageRatingAPIView(APIView):
+    permission_classes = (AllowAny, )
+    look_url_kwarg = "slug"
+
+    def get(self, *args, **kwargs):
+        slug = self.kwargs.get(self.look_url_kwarg)
+        article = Article.objects.filter(slug = slug)
+        return Response({"averageRating":article[0].rating},status = status.HTTP_200_OK)
+
+
 
 class LikeArticleAPIView(APIView):
     permission_classes = (IsAuthenticated, )
