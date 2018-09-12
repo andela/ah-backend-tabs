@@ -75,20 +75,21 @@ class GetAllCommentsAPIView(ListAPIView):
 
 
 class GetLikesandDislikesAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     look_url_kwarg = "slug"
 
     def get(self, *args, **kwargs):
-        jwt = JWTAuthentication()
-        user_data = jwt.authenticate(self.request)
         slug = self.kwargs.get(self.look_url_kwarg)
         article = Article.objects.filter(slug=slug)
-        if article[0].likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
-            return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": True, "everdisLiked": False}, status=status.HTTP_200_OK)
-        if article[0].dislikes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
-            return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": False, "everdisLiked": True}, status=status.HTTP_200_OK)
+        auth =  self.request.META['HTTP_AUTHORIZATION'].split()
+        if len(auth) == 2:
+            jwt = JWTAuthentication()
+            user_data = jwt.authenticate(self.request)
+            if article[0].likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+                return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": True, "everdisLiked": False}, status=status.HTTP_200_OK)
+            if article[0].dislikes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+                return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": False, "everdisLiked": True}, status=status.HTTP_200_OK)
         return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": False, "everdisLiked": False}, status=status.HTTP_200_OK)
-
 
 class GetArticleAverageRatingAPIView(APIView):
     permission_classes = (AllowAny, )
