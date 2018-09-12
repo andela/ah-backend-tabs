@@ -60,6 +60,7 @@ class CommentCreateAPIView(CreateAPIView):
         serializer.save(
             author=user_data[0], article=get_object_or_404(Article, slug=slug))
 
+
 class GetAllCommentsAPIView(ListAPIView):
     permission_classes = (AllowAny, )
     serializer_class = CreateCommentSerializer
@@ -68,18 +69,26 @@ class GetAllCommentsAPIView(ListAPIView):
 
     def get_queryset(self):
         slug = self.kwargs.get(self.look_url_kwarg)
-        article = Article.objects.filter(slug = slug)
+        article = Article.objects.filter(slug=slug)
         comments = article[0].user_comments.all()
         return comments
 
+
 class GetLikesandDislikesAPIView(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (IsAuthenticated, )
     look_url_kwarg = "slug"
 
     def get(self, *args, **kwargs):
+        jwt = JWTAuthentication()
+        user_data = jwt.authenticate(self.request)
         slug = self.kwargs.get(self.look_url_kwarg)
-        article = Article.objects.filter(slug = slug)
-        return Response({"likes":article[0].likesCount, "dislikes":article[0].dislikesCount},status = status.HTTP_200_OK)
+        article = Article.objects.filter(slug=slug)
+        if article[0].likes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+            return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": True, "everdisLiked": False}, status=status.HTTP_200_OK)
+        if article[0].dislikes.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+            return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": False, "everdisLiked": True}, status=status.HTTP_200_OK)
+        return Response({"likes": article[0].likesCount, "dislikes": article[0].dislikesCount, "everLiked": False, "everdisLiked": False}, status=status.HTTP_200_OK)
+
 
 class GetArticleAverageRatingAPIView(APIView):
     permission_classes = (AllowAny, )
@@ -87,9 +96,8 @@ class GetArticleAverageRatingAPIView(APIView):
 
     def get(self, *args, **kwargs):
         slug = self.kwargs.get(self.look_url_kwarg)
-        article = Article.objects.filter(slug = slug)
-        return Response({"averageRating":article[0].rating},status = status.HTTP_200_OK)
-
+        article = Article.objects.filter(slug=slug)
+        return Response({"averageRating": article[0].rating}, status=status.HTTP_200_OK)
 
 
 class LikeArticleAPIView(APIView):
@@ -231,11 +239,13 @@ class SearchArticlesAPIView(ListAPIView):
                             filtered_queryset.append(article)
         return filtered_queryset
 
+
 class ListAllArticlesAPIView(ListAPIView):
     permission_classes = (AllowAny, )
     serializer_class = CreateArticleSerializer
     renderer_classes = (ListArticlesJSONRenderer,)
     pagination_class = PageNumberPagination
+
     def get_queryset(self):
         articles = Article.objects.all()
         return articles
@@ -279,7 +289,7 @@ class DeleteArticleAPIView(APIView):
 
     def delete(self, request, *args, **kwargs):
         slug = self.kwargs.get(self.look_url_kwarg)
-        
+
         article = Article.objects.filter(slug=slug).delete()
 
         if article[0] == 0:
