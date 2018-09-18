@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from .models import Article, Rating
+from .models import Article, Rating, TextComment
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ['title','description','author','created_at','updated_at','rating']
@@ -14,6 +14,9 @@ class ArticleRating(admin.ModelAdmin):
             
         return super(ArticleRating, self).save_model(request, obj, form, change)
 
+class TextCommentAdmin(admin.ModelAdmin):
+    list_display = ['article','selected', 'author', 'body']
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Rating, ArticleRating)
+admin.site.register(TextComment, TextCommentAdmin)
