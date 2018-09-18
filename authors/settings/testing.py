@@ -18,9 +18,9 @@ port_number = parsed_url.port
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': dbname,
-        'USER': username,
-        'PASSWORD': pwd,
+        'NAME': 'authors_haven_test',
+        'USER': 'postgres',
+        'PASSWORD': 'RIp0772466608*',
         'HOST': hostname,
         'PORT': port_number,
     }

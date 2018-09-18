@@ -27,7 +27,8 @@ urlpatterns = [
     path('api/', include('authors.apps.authentication.urls',
                          namespace='authentication')),
     path('api/profiles/', include('authors.apps.profiles.urls', namespace='profiles')),
-    path('api/users/', include('authors.apps.follower.urls', namespace="follows"))
+    path('api/users/', include('authors.apps.follower.urls', namespace="follows")),
+    path('api/user/', include('authors.apps.notifications.urls', namespace="notifications"))
 ]
 
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
