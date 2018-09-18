@@ -57,9 +57,4 @@ class OptIn_OptOut_Notifications(APIView):
             "message": "Opt in status for notifications is now changed to {}".format(user.opt_in_for_notifications)
             }, status=status.HTTP_200_OK)
 
-        
-
-
-
-
 
