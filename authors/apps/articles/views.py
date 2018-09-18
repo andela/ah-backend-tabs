@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, ListAPIView
-from authors.apps.articles.serializers import CreateArticleSerializer, RateArticleSerializer, CreateCommentSerializer, UpdateArticleSerializer
+from authors.apps.articles.serializers import CreateArticleSerializer, RateArticleSerializer, CreateCommentSerializer, UpdateArticleSerializer, CreateTextCommentSerializer
 from authors.apps.articles.renderers import ArticleJSONRenderer, RateArticleJSONRenderer, CommentJSONRenderer, ListArticlesJSONRenderer
 from rest_framework.views import APIView
 from .serializers import CreateArticleSerializer
@@ -14,7 +14,6 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from ..notifications.models import Notifications
-
 
 from authors.apps.authentication.backends import JWTAuthentication
 
@@ -42,10 +41,6 @@ class ArticleCreateAPIView(CreateAPIView):
             except:
                 pass
 
-
-
-
-
 class RateArticleAPIView(CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = RateArticleSerializer
@@ -71,7 +66,32 @@ class CommentCreateAPIView(CreateAPIView):
         user_data = jwt.authenticate(self.request)
         slug = self.kwargs.get(self.look_url_kwarg)
         serializer.save(
-            author=user_data[0], article=get_object_or_404(Article, slug=slug))
+            author=user_data[0], article=get_object_or_404(Article))
+
+class ArticleTextCommentCreateAPIView(CreateAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CreateTextCommentSerializer
+    look_url_kwarg = "slug"
+
+    def perform_create(self, serializer):
+        jwt = JWTAuthentication()
+        user_data = jwt.authenticate(self.request)
+        slug = self.kwargs.get(self.look_url_kwarg)
+        current_article = get_object_or_404(Article, slug=slug)
+        serializer.save(
+            author=user_data[0], article=current_article)
+
+class GetAllArticleTextCommentsAPIView(ListAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = CreateTextCommentSerializer
+    pagination_class = PageNumberPagination
+    look_url_kwarg = "slug"
+
+    def get_queryset(self):
+        slug = self.kwargs.get(self.look_url_kwarg)
+        article = Article.objects.filter(slug=slug)
+        text_comments = article[0].user_text_comments.all()
+        return text_comments
 
 
 class GetAllCommentsAPIView(ListAPIView):

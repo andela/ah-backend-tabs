@@ -112,3 +112,17 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.body
+
+class TextComment(models.Model):
+    author = models.ForeignKey(User, related_name="text_comment_author", on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, related_name="user_text_comments", on_delete=models.CASCADE, blank=True)
+    selected = models.TextField()
+    body = models.TextField()
+    created_at = models.DateTimeField(editable=False, auto_now=True)
+    updated_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return 'selected text: {} and comment {}'.format(self.selected,self.body) 

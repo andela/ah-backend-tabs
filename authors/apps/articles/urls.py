@@ -14,6 +14,8 @@ from .views import (
     GetAllCommentsAPIView,
     GetLikesandDislikesAPIView,
     GetArticleAverageRatingAPIView,
+    ArticleTextCommentCreateAPIView,
+    GetAllArticleTextCommentsAPIView
 )
 
 app_name = "articles"
@@ -32,4 +34,6 @@ urlpatterns = [
     path('articles/<slug>/all/comments/', GetAllCommentsAPIView.as_view()),
     path('articles/<slug>/likes/dislikes/', GetLikesandDislikesAPIView.as_view()),
     path('articles/<slug>/average-rating/', GetArticleAverageRatingAPIView.as_view()),
+    path('articles/<slug>/text-comment/', ArticleTextCommentCreateAPIView.as_view()),
+    path('articles/<slug>/all/text-comments/', GetAllArticleTextCommentsAPIView.as_view()),
 ]

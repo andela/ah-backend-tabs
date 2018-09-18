@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from authors.apps.authentication.models import User
-from authors.apps.articles.models import Article, Rating, Comment
+from authors.apps.articles.models import Article, Rating, Comment, TextComment
 
 from taggit_serializer.serializers import (
     TagListSerializerField, TaggitSerializer)
@@ -75,6 +75,30 @@ class CreateCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        fields = '__all__'
+
+class CreateTextCommentSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    article = serializers.SerializerMethodField()
+
+    def get_author(self, obj):
+        author = {
+            "username": obj.author.username,
+            "email": obj.author.email,
+            "bio": obj.author.bio,
+            "image": obj.author.image
+        }
+        return author
+
+    def get_article(self, obj):
+        article = {
+            "slug": obj.article.slug,
+            "title": obj.article.title,
+        }
+        return article
+
+    class Meta:
+        model = TextComment
         fields = '__all__'
 
 
