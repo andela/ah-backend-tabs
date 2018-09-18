@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'taggit',
     'djmail',
+    'authors.apps.notifications',
 ]
 
 MIDDLEWARE = [

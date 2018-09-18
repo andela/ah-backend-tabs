@@ -118,6 +118,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # More fields required by Django when specifying a custom user model.
     bio = models.CharField(max_length=255, blank=True)
     image = models.CharField(max_length=800, blank=True)
+    opt_in_for_notifications = models.BooleanField(default=True)
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

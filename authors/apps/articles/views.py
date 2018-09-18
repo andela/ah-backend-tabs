@@ -13,6 +13,7 @@ from rest_framework import status, exceptions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
+from ..notifications.models import Notifications
 
 
 from authors.apps.authentication.backends import JWTAuthentication
@@ -30,7 +31,19 @@ class ArticleCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         jwt = JWTAuthentication()
         user_data = jwt.authenticate(self.request)
-        serializer.save(author=user_data[0])
+        author = User.objects.get(email=user_data[0])
+        followers = author.followers.all()
+        article = serializer.save(author=user_data[0])
+
+        for follower in followers:
+            try:
+                user = User.objects.get(email = follower.email, opt_in_for_notifications=True)
+                Notifications(user_to_notify=user,author=author,article=article).save()
+            except:
+                pass
+
+
+
 
 
 class RateArticleAPIView(CreateAPIView):
@@ -296,3 +309,5 @@ class DeleteArticleAPIView(APIView):
             return Response({'message': 'Operation was not performed, no such article found.'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'message': 'Article deleted.'}, status=status.HTTP_200_OK)
+
+
