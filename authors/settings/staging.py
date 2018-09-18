@@ -6,7 +6,7 @@ from authors.settings.base import *
 from urllib.parse import urlparse
 
 # Turn debug off in staging and production
-DEBUG = False
+DEBUG = True
 
 db_url = os.getenv("DATABASE_URL")
 
