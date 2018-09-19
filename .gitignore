@@ -105,5 +105,3 @@ sendgrid.env
 #media files
 media/
 
-#migrations
-migrations/
