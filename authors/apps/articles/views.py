@@ -20,6 +20,7 @@ from authors.apps.authentication.backends import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 import json
+import re
 
 
 class ArticleCreateAPIView(CreateAPIView):
@@ -252,10 +253,12 @@ class SearchArticlesAPIView(ListAPIView):
         queryset = Article.objects.all()
         if "title" in self.request.query_params:
             filter_field = self.request.query_params.get('title')
+            filter_field = re.sub('-', ' ', filter_field)
             filtered_queryset = queryset.filter(title__icontains=filter_field)
 
         if "author" in self.request.query_params:
             filter_field = self.request.query_params.get('author')
+            filter_field = re.sub('-', ' ', filter_field)
             user = get_object_or_404(User, username__icontains=filter_field)
             filtered_queryset = queryset.filter(author=user.id)
 
@@ -265,6 +268,7 @@ class SearchArticlesAPIView(ListAPIView):
 
         if "tag" in self.request.query_params:
             filter_field = self.request.query_params.get('tag')
+            filter_field = re.sub('-', ' ', filter_field)
             filtered_queryset = []
             if filter_field is not None:
                 for article in queryset:
