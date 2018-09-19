@@ -67,7 +67,7 @@ class CommentCreateAPIView(CreateAPIView):
         user_data = jwt.authenticate(self.request)
         slug = self.kwargs.get(self.look_url_kwarg)
         serializer.save(
-            author=user_data[0], article=get_object_or_404(Article))
+            author=user_data[0], article=get_object_or_404(Article, slug=slug))
 
 class ArticleTextCommentCreateAPIView(CreateAPIView):
     permission_classes = (IsAuthenticated, )
