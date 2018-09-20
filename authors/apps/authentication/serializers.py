@@ -65,6 +65,8 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
+    image = serializers.CharField(max_length=255, read_only=True)
+    opt_in_for_notifications = serializers.BooleanField(default=True, read_only=True)
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current
@@ -122,7 +124,9 @@ class LoginSerializer(serializers.Serializer):
         return {
             'email': user.email,
             'username': user.username,
-            'token': user.token
+            'token': user.token,
+            'image': user.image,
+            'opt_in_for_notifications': user.opt_in_for_notifications
         }
 
 
@@ -185,6 +189,8 @@ class FacebookAPISerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255, read_only=True)
     token = token = serializers.CharField(max_length=255, read_only=True)
     message = serializers.CharField(max_length=255, read_only=True)
+    image = serializers.CharField(max_length=255, read_only=True)
+    opt_in_for_notifications = serializers.BooleanField(default=True, read_only=True)
 
     def validate_fbauth_token(self, fbauth_token):
 
@@ -203,7 +209,9 @@ class FacebookAPISerializer(serializers.Serializer):
                 'email': new_user[0].email,
                 'username': new_user[0].username,
                 'token': new_user[0].token,
-                'message': 'You signed up with Facebook!'
+                'message': 'You signed up with Facebook!',
+                'image': new_user[0].image,
+                'opt_in_for_notifications': user.opt_in_for_notifications
             })
 
         # update email incase user changed their fb email
@@ -213,12 +221,16 @@ class FacebookAPISerializer(serializers.Serializer):
         return json.dumps({
             'email': qs[0].email,
             'username': qs[0].username,
-            'token': qs[0].token
+            'token': qs[0].token,
+            'image': qs[0].image,
+            'opt_in_for_notifications': user.opt_in_for_notifications
         })
 
 
 class GoogleAPISerializer(serializers.Serializer):
     googleauth_token = serializers.CharField()
+    image = serializers.CharField(max_length=255, read_only=True)
+    opt_in_for_notifications = serializers.BooleanField(default=True, read_only=True)
 
     def validate_googleauth_token(self, googleauth_token):
 
@@ -241,12 +253,16 @@ class GoogleAPISerializer(serializers.Serializer):
                 'email': new_user[0].email,
                 'username': new_user[0].username,
                 'token': new_user[0].token,
-                'message': 'You signed up with Google!'
+                'message': 'You signed up with Google!',
+                'image': new_user[0].image,
+                'opt_in_for_notifications': user.opt_in_for_notifications
             })
         qs.update(google_social_id=google_user_info["sub"], is_verified=True)
 
         return json.dumps({
             'email': qs[0].email,
             'username': qs[0].username,
-            'token': qs[0].token
+            'token': qs[0].token,
+            'image': qs[0].image,
+            'opt_in_for_notifications': user.opt_in_for_notifications
         })
