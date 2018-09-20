@@ -211,7 +211,7 @@ class FacebookAPISerializer(serializers.Serializer):
                 'token': new_user[0].token,
                 'message': 'You signed up with Facebook!',
                 'image': new_user[0].image,
-                'opt_in_for_notifications': user.opt_in_for_notifications
+                'opt_in_for_notifications': new_user[0].opt_in_for_notifications
             })
 
         # update email incase user changed their fb email
@@ -223,7 +223,7 @@ class FacebookAPISerializer(serializers.Serializer):
             'username': qs[0].username,
             'token': qs[0].token,
             'image': qs[0].image,
-            'opt_in_for_notifications': user.opt_in_for_notifications
+            'opt_in_for_notifications': qs[0].opt_in_for_notifications
         })
 
 
@@ -255,7 +255,7 @@ class GoogleAPISerializer(serializers.Serializer):
                 'token': new_user[0].token,
                 'message': 'You signed up with Google!',
                 'image': new_user[0].image,
-                'opt_in_for_notifications': user.opt_in_for_notifications
+                'opt_in_for_notifications': new_user[0].opt_in_for_notifications
             })
         qs.update(google_social_id=google_user_info["sub"], is_verified=True)
 
@@ -264,5 +264,5 @@ class GoogleAPISerializer(serializers.Serializer):
             'username': qs[0].username,
             'token': qs[0].token,
             'image': qs[0].image,
-            'opt_in_for_notifications': user.opt_in_for_notifications
+            'opt_in_for_notifications': qs[0].opt_in_for_notifications
         })
