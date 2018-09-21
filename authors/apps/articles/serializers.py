@@ -24,7 +24,7 @@ class CreateArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ['slug', 'title', 'description', 'body', 'created_at', 'updated_at',
-                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags','image','rating']
+                  'author', 'favorited', 'favoritesCount', 'likesCount', 'dislikesCount', 'tags','image','rating','viewsCount']
 
 
 class RateArticleSerializer(serializers.ModelSerializer):

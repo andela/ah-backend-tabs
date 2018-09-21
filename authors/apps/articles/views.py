@@ -263,7 +263,14 @@ class SearchArticlesAPIView(ListAPIView):
             filtered_queryset = queryset.filter(author=user.id)
 
         if "slug" in self.request.query_params:
+            jwt = JWTAuthentication()
+            user_data = jwt.authenticate(self.request)
             filter_field = self.request.query_params.get('slug')
+            article = get_object_or_404(Article, slug=filter_field)
+            if not article.views.filter(id=User.objects.filter(email=user_data[0])[0].id).exists():
+                article.views.add(user_data[0])
+                article.viewsCount += 1
+                article.save()
             filtered_queryset = queryset.filter(slug=filter_field)
 
         if "tag" in self.request.query_params:
