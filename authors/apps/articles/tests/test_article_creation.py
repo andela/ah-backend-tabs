@@ -43,7 +43,7 @@ class CreateArticleTestCase(TestCase):
         response = ArticleCreateAPIView.as_view()(request)
         self.assertEqual("This is Postman", response.data["title"])
         self.assertEqual(
-            {"username": "tester", "email": "test@gmail.com", "bio": ""}, response.data["author"])
+            {"username": "tester", "email": "test@gmail.com", "bio": "","image":""}, response.data["author"])
         self.assertEqual(2, len(response.data["tags"]))
         self.assertEqual(response.status_code, 201)
 

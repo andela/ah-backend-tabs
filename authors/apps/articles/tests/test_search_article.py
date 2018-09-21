@@ -62,14 +62,16 @@ class SearchArticleTestCase(TestCase):
         self.assertEqual(response.data["count"], 0)
 
     def test_search_by_slug_normal(self):
-        request = self.factory.get('api/articles/search?slug=how-to-survive')
+        headers = {'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]}
+        request = self.factory.get('api/articles/search?slug=how-to-survive', **headers)
         response = SearchArticlesAPIView.as_view()(request)
         self.assertEqual(response.status_code, 200)
 
     def test_search_by_slug_non_existent(self):
-        request = self.factory.get('api/articles/search?slug=XYZ')
+        headers = {'HTTP_AUTHORIZATION': 'Token ' + self.response.data["token"]}
+        request = self.factory.get('api/articles/search?slug=XYZ', **headers)
         response = SearchArticlesAPIView.as_view()(request)
-        self.assertEqual(response.data["count"], 0)
+        self.assertEqual(response.data["detail"], "Not found.")
 
     def test_search_by_tag_normal(self):
             request = self.factory.get('api/articles/search?tag=test')
