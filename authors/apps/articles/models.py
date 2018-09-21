@@ -28,6 +28,8 @@ class Article(models.Model):
     favorites = models.ManyToManyField(
         User, related_name="favorites", blank=True)
     image = models.TextField(null=True, blank=True)
+    viewsCount = models.IntegerField(default=0)
+    views = models.ManyToManyField(User, related_name="views", blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
