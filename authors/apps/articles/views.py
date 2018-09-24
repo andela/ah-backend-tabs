@@ -11,7 +11,7 @@ from authors.apps.authentication.backends import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework import status, exceptions
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404,get_list_or_404
 from rest_framework.pagination import PageNumberPagination
 from ..notifications.models import Notifications
 
@@ -272,6 +272,12 @@ class SearchArticlesAPIView(ListAPIView):
                 article.viewsCount += 1
                 article.save()
             filtered_queryset = queryset.filter(slug=filter_field)
+
+        if "favorite" in self.request.query_params:
+           jwt = JWTAuthentication()
+           user_data = jwt.authenticate(self.request)
+           articles = get_list_or_404(Article, favorites=User.objects.filter(email=user_data[0])[0].id)
+           return articles
 
         if "tag" in self.request.query_params:
             filter_field = self.request.query_params.get('tag')
